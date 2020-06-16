@@ -2,6 +2,8 @@
 
 namespace App\Controller\Api\V1;
 
+
+use App\Entity\User;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
@@ -42,16 +44,16 @@ class UserController extends AbstractController
     /**
      * @Route("/{id}", name="read", methods={"GET"})
      */
-    public function read(User $question)
+    public function read(User $user)
     {
         return $this->json(
             $this->serializer->normalize(
-                $question,
+                $user,
                 null,
                 [
                     'groups' =>
                     [
-                        'api_v1_questions',
+                        'api_v1_users',
                         'api_v1_questions_details'
 
                     ],
