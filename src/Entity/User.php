@@ -7,6 +7,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
  */
@@ -21,36 +23,43 @@ class User
 
     /**
      * @ORM\Column(type="string", length=64)
+     * @Groups({"api_v1_users"})
      */
     private $email;
 
     /**
      * @ORM\Column(type="string", length=64)
+     * @Groups({"api_v1_users"})
      */
     private $password;
 
     /**
      * @ORM\Column(type="string", length=64)
+     * @Groups({"api_v1_users"})
      */
     private $username;
 
     /**
      * @ORM\Column(type="string", length=64, nullable=true)
+     * @Groups({"api_v1_users"})
      */
     private $avatar;
 
     /**
      * @ORM\Column(type="string", length=64)
+     * @Groups({"api_v1_users"})
      */
     private $role;
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"api_v1_users"})
      */
     private $is_active;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"api_v1_users"})
      */
     private $created_at;
 
