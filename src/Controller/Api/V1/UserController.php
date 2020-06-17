@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Request;
-
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
  * @Route("/api/v1/users", name="api_v1_user_")
@@ -19,30 +19,28 @@ use Symfony\Component\HttpFoundation\Request;
 class UserController extends AbstractController
 {
 
-    private $normalizer;
+    private $objetNormalizer;
+    private $encoder;
 
-    public function __construct(ObjectNormalizer $objetNormalizer)
+    public function __construct(ObjectNormalizer $objetNormalizer,UserPasswordEncoderInterface $encoder)
     {
         $this->normalizer = $objetNormalizer;
         $this->serializer = new Serializer([$objetNormalizer]);
+        $this->encoder = $encoder;
     }
-   /**
+    /**
      * 
      * @Route("/", name="list")
      * 
      */
-    public function list( UserRepository $userRepository)
+    public function list(UserRepository $userRepository)
     {
         $users = $userRepository->findAll();
-    /// dd($users);
-        
-
 
         $json = $this->serializer->normalize($users, null, ['groups' => 'api_v1_users']);
 
         return $this->json($json);
     }
-
 
     /**
      * @Route("/{id}", name="read", methods={"GET"})
@@ -50,48 +48,34 @@ class UserController extends AbstractController
     public function read(User $user)
     {
         return $this->json(
-            $this->serializer->normalize($user,null,['groups' =>['api_v1_users']]));
+            $this->serializer->normalize($user, null, ['groups' => ['api_v1_users','api_v1_users_read']])
+        );
     }
 
 
     /**
-     * @Route("", name="new", methods={"POST"})
+     * @Route("", name="add", methods={"POST"})
      */
-   public function new(Request $request, ObjectNormalizer $objetNormalizer)
+    public function add(Request $request, ObjectNormalizer $objetNormalizer)
     {
-        // Depuis l'installation du JWT, on peut retrouver l'utilisateur connecté
-        // comme si on avait une session classique avec un cookie
-        // Pour retrouver l'utilisateur :
-        // $user = $this->getUser();
-        // dd($user);
-        // On pourrait par exemple vérifier le rôle de l'utilisateur ici
-        // Encore mieux, on pourrait utiliser des Voters pour vérifier que cet utilisateur a le droir «add» sur $movie
 
-
-        // Pour créer un nouveau Movie depuis une requête en API
-        // on peut utiliser les formulaires
-        // La structure des données permettra d'associer
-        // les propriétés du JSON aux champs de notre formulaire
-        
         $user = new User();
-        
-        // L'option supplémentaire permet de ne pas vérifier le token CSRF
-        // Comme on est en API, les requêtes sont forcément forgées,
-        // elles proviennent d'utilisateurs qu'on pourra identifier, la protection CSRF est injustifiée ici
+
         $form = $this->createForm(UserType::class, $user, ['csrf_protection' => false]);
-        
+
         // L'option true (deuxième argument de json_decode(), permet de spécifier qu'on veut un arra yet pas un objet)
         $json = json_decode($request->getContent(), true);
-
+        //dd($json);
         // On simule l'envoi du formulaire
         $form->submit($json);
-        
+        //dd($form->submit($json));
+
         // On vérifie que les données reçues sont valides selon les contraintes de validation qu'on connait
         if ($form->isValid()) {
 
             // Ça y est, les données de la requête ont été associées à notre formulaire puis à $movie
             // Il ne reste plus qu'à persister $movie
-           
+            $user->setPassword($this->encoder->encodePassword($user, $user->getPassword()));
             $em = $this->getDoctrine()->getManager();
             $em->persist($user);
             $em->flush();
@@ -109,12 +93,9 @@ class UserController extends AbstractController
             // Ce n'est pas du JSON, il y a sûrement un moyen, à la main, de sérialiser les erreurs mieux que ça
             // On précise également le code de status de réponse : 400
             // (string) c'est pour parser (transformer) notre objet en string
-            ($form->getErrors(true));
-        
+            dd($form->getErrors(true));
+
             return $this->json((string) $form->getErrors(true), 400);
         }
-    } 
-
+    }
 }
-
-

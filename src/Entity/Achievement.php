@@ -6,6 +6,7 @@ use App\Repository\AchievementRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=AchievementRepository::class)
@@ -16,16 +17,19 @@ class Achievement
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"api_v1_users_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=64)
+     * *@Groups({"api_v1_users_read"})
      */
     private $phrase;
 
     /**
      * @ORM\Column(type="string", length=64)
+     * @Groups({"api_v1_users_read"})
      */
     private $icon;
 
