@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\GameRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -16,26 +17,31 @@ class Game
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"api_v1_game"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=64)
+     * @Groups({"api_v1_game"})
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=64)
+     * @Groups({"api_v1_game"})
      */
     private $icon;
 
     /**
      * @ORM\ManyToMany(targetEntity=Achievement::class, inversedBy="games")
+     * @Groups({"api_v1_game"})
      */
     private $game_achievement;
 
     /**
      * @ORM\OneToMany(targetEntity=Play::class, mappedBy="game", orphanRemoval=true, cascade={"persist"})
+     * @Groups({"api_v1_game"})
      */
     private $plays;
 

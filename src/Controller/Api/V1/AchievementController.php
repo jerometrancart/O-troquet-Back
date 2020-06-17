@@ -5,13 +5,10 @@ namespace App\Controller\Api\V1;
 
 
 use App\Entity\Achievement;
-use App\Entity\User;
 use App\Form\AchievementType;
 use App\Repository\AchievementRepository;
-use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
-
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -122,26 +119,6 @@ class AchievementController extends AbstractController
 
 
 
-
-
-    /**
-     * @Route("/{id}/banned", name="banned",methods={"GET","POST"})
-     */
-    public function banned($id)
-    {
-        // je recupère mon entité
-        $user = $this->getDoctrine()->getRepository(User::class)->find($id);
-        // je demande le manager
-        $manager = $this->getDoctrine()->getManager();
-
-        $user->setIsActive(false);
-        // je demande au manager d'executer dans la BDD toute les modifications qui ont été faites sur les entités
-        $manager->flush();
-        return $this->json([
-            'message' => 'Vôtre compte à été banni',
-            'path' => 'src/Controller/Api/V1/UserController.php',
-        ]);
-    }
 
 }
 
