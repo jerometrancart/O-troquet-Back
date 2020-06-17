@@ -34,7 +34,6 @@ class Game
      */
     private $game_achievement;
 
-
     /**
      * @ORM\OneToMany(targetEntity=Play::class, mappedBy="game", orphanRemoval=true, cascade={"persist"})
      */
@@ -128,7 +127,7 @@ class Game
                 $play->setGame(null);
             }
         }
-
+        
         return $this;
     }
 

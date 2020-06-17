@@ -57,13 +57,14 @@ class User implements UserInterface
     private $avatar;
 
     /**
-     * @ORM\Column(type="json", length=64)
+     * @ORM\Column(type="json", length=64,nullable=true)
      * @Groups({"api_v1_users"})
      */
     private $roles = [];
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"api_v1_users"})
      */
     private $is_active;
 
@@ -84,7 +85,7 @@ class User implements UserInterface
      * The people who I think are my friends.
      *
      *@ORM\OneToMany(targetEntity="UserFriends", mappedBy="user")
-     *
+     *@Groups({"api_v1_users"})
      */ 
     private $friends;
 
@@ -92,6 +93,7 @@ class User implements UserInterface
      * The people who think that I’m their friend.
      *
      * @ORM\OneToMany(targetEntity="UserFriends", mappedBy="friend") 
+     *@Groups({"api_v1_users"})
      */
     private $friendsWithMe;
 
@@ -117,7 +119,7 @@ class User implements UserInterface
         $this->plays = new ArrayCollection();
     }
 
-
+    
     /**
      * @see UserInterface
      */
