@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\AchievementRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -17,39 +18,49 @@ class Achievement
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+
      * @Groups({"api_v1_users_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=64)
+
      * *@Groups({"api_v1_users_read"})
+
+
      */
     private $phrase;
 
     /**
      * @ORM\Column(type="string", length=64)
+
      * @Groups({"api_v1_users_read"})
+
      */
     private $icon;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"api_v1_achievement"})
      */
     private $created_at;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
+     * @Groups({"api_v1_achievement"})
      */
     private $updated_at;
 
     /**
      * @ORM\ManyToMany(targetEntity=User::class, inversedBy="achievements")
+     * @Groups({"api_v1_achievement"})
      */
     private $hadUsers;
 
     /**
      * @ORM\ManyToMany(targetEntity=Game::class, mappedBy="game_achievement")
+     * @Groups({"api_v1_achievement"})
      */
     private $games;
 
