@@ -118,6 +118,9 @@ class UserController extends AbstractController
         }
     }
 
+
+
+
     /**
      * @Route("/{id}/update", name="update",  methods={"GET","POST"})
      */
@@ -149,7 +152,6 @@ class UserController extends AbstractController
             // On précise également le code de status de réponse : 400
             // (string) c'est pour parser (transformer) notre objet en string
             ($form->getErrors(true));
-            dd($form->getErrors(true));
 
             return $this->json((string)$form->getErrors(true), 400);
 
@@ -172,6 +174,30 @@ class UserController extends AbstractController
         $manager->flush();
         return $this->json([
             'message' => 'Vôtre compte a bien supprimé',
+            'path' => 'src/Controller/Api/V1/UserController.php',
+        ]);
+    }
+
+
+
+
+
+
+/**
+     * @Route("/{id}/banned", name="banned",methods={"GET","POST"})
+     */
+    public function banned($id)
+    {
+        // je recupère mon entité
+        $user = $this->getDoctrine()->getRepository(User::class)->find($id);
+        // je demande le manager
+        $manager = $this->getDoctrine()->getManager();
+        // je dit au manager que cette entité devra faire l'objet d'une suppression
+      $user->setIsActive(false);
+        // je demande au manager d'executer dans la BDD toute les modifications qui ont été faites sur les entités
+        $manager->flush();
+        return $this->json([
+            'message' => 'Vôtre compte à été banni',
             'path' => 'src/Controller/Api/V1/UserController.php',
         ]);
     }
