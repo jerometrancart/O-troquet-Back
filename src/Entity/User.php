@@ -6,53 +6,75 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\User\UserInterface;
+
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
+ * 
+ * On déclare que notre entité a des LifecycleCallbacks
+ * @ORM\HasLifecycleCallbacks()
+ * 
+ * @UniqueEntity(
+ *     fields={"email"},
+ *     message="Un email existe déjà avec ce libellé")
  */
-class User
+class User implements UserInterface
 {
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"api_v1_users"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=64)
+     * @Groups({"api_v1_users"})
      */
     private $email;
 
     /**
-     * @ORM\Column(type="string", length=64)
+     * @ORM\Column(type="string", length=255)
+     * @Groups({"api_v1_users"})
      */
     private $password;
 
     /**
      * @ORM\Column(type="string", length=64)
+     * @Groups({"api_v1_users"})
      */
     private $username;
 
     /**
      * @ORM\Column(type="string", length=64, nullable=true)
+     * @Groups({"api_v1_users"})
      */
     private $avatar;
 
     /**
-     * @ORM\Column(type="string", length=64)
+     * @ORM\Column(type="json", length=64,nullable=true)
+     * @Groups({"api_v1_users"})
      */
-    private $role;
+    private $roles = [];
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"api_v1_users"})
      */
     private $is_active;
 
     /**
      * @ORM\Column(type="datetime")
+     * @Groups({"api_v1_users"})
+     * @Assert\Type(\DateTime::class)
+     * 
      */
-    private $created_at;
+    private $created_at ;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
@@ -62,24 +84,26 @@ class User
     /**
      * The people who I think are my friends.
      *
-     * @ORM\OneToMany(targetEntity="UserFriends", mappedBy="user")
-     */
+     *@ORM\OneToMany(targetEntity="UserFriends", mappedBy="user")
+     *@Groups({"api_v1_users"})
+     */ 
     private $friends;
 
     /**
      * The people who think that I’m their friend.
      *
-     * @ORM\OneToMany(targetEntity="UserFriends", mappedBy="friend")
-     * 
+     * @ORM\OneToMany(targetEntity="UserFriends", mappedBy="friend") 
+     *@Groups({"api_v1_users"})
      */
     private $friendsWithMe;
 
     /**
      * @ORM\ManyToMany(targetEntity=Achievement::class, mappedBy="hadUsers")
+     *
      */
     private $achievements;
 
-
+    
     /**
      * @ORM\OneToMany(targetEntity=Play::class, mappedBy="user", orphanRemoval=true)
      */
@@ -87,10 +111,30 @@ class User
 
     public function __construct()
     {
+        $this->created_at = new \DateTime();
+        $this->is_active = true;
         $this->friends = new ArrayCollection();
         $this->friendsWithMe = new ArrayCollection();
         $this->achievements = new ArrayCollection();
         $this->plays = new ArrayCollection();
+    }
+
+    
+    /**
+     * @see UserInterface
+     */
+    public function getSalt()
+    {
+        // not needed when using the "bcrypt" algorithm in security.yaml
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials()
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
     }
 
     public function getId(): ?int
@@ -146,14 +190,21 @@ class User
         return $this;
     }
 
-    public function getRole(): ?string
+   /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
     {
-        return $this->role;
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
     }
 
-    public function setRole(string $role): self
+    public function setRoles(array $roles): self
     {
-        $this->role = $role;
+        $this->roles = $roles;
 
         return $this;
     }
@@ -224,7 +275,7 @@ class User
 
         return $this;
     }
-
+    
     /**
      * @return Collection|UserFriends[]
      */
@@ -314,5 +365,4 @@ class User
 
         return $this;
     }
-
 }

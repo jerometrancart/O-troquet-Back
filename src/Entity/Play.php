@@ -19,8 +19,7 @@ class Play
      */
     private $id;
 
-   
-
+    
     /**
      * @ORM\Column(type="boolean")
      */
