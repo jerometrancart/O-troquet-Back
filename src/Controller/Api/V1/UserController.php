@@ -109,7 +109,8 @@ class UserController extends AbstractController
             // Ce n'est pas du JSON, il y a sûrement un moyen, à la main, de sérialiser les erreurs mieux que ça
             // On précise également le code de status de réponse : 400
             // (string) c'est pour parser (transformer) notre objet en string
-            //dd($form->getErrors(true));
+            ($form->getErrors(true));
+        
             return $this->json((string) $form->getErrors(true), 400);
         }
     } 

@@ -22,7 +22,7 @@ security:
                 failure_handler:          lexik_jwt_authentication.handler.authentication_failure
         users:
             pattern:   ^/api/v1/users
-            methods: [GET,PUT, PATCH, DELETE]
+            methods: [PUT, PATCH, DELETE]
             stateless: true
             guard:
                 authenticators:
