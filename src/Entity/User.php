@@ -38,9 +38,14 @@ class User implements UserInterface
      */
     private $email;
 
+
     /**
      * @ORM\Column(type="string", length=255)
+     * 
      * @Groups({"api_v1_users"})
+     * 
+     * * @Assert\NotBlank(message="New password can not be blank.")
+     *  @Assert\Regex(pattern="/^(?=.*[a-z])(?=.*\d).{6,}$/i", message="New password is required to be minimum 6 chars in length and to include at least one letter and one number.")
      */
     private $password;
 
@@ -74,7 +79,7 @@ class User implements UserInterface
      * @Assert\Type(\DateTime::class)
      * 
      */
-    private $created_at ;
+    private $created_at;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
@@ -85,25 +90,26 @@ class User implements UserInterface
      * The people who I think are my friends.
      *
      *@ORM\OneToMany(targetEntity="UserFriends", mappedBy="user")
-     *@Groups({"api_v1_users"})
-     */ 
+     *@Groups({"api_v1_users_read"})
+     */
     private $friends;
 
     /**
      * The people who think that I’m their friend.
      *
      * @ORM\OneToMany(targetEntity="UserFriends", mappedBy="friend") 
-     *@Groups({"api_v1_users"})
+     *@Groups({"api_v1_users_read"})
      */
     private $friendsWithMe;
 
     /**
      * @ORM\ManyToMany(targetEntity=Achievement::class, mappedBy="hadUsers")
+     * @Groups({"api_v1_users_read"})
      *
      */
     private $achievements;
 
-    
+
     /**
      * @ORM\OneToMany(targetEntity=Play::class, mappedBy="user", orphanRemoval=true)
      */
@@ -119,7 +125,7 @@ class User implements UserInterface
         $this->plays = new ArrayCollection();
     }
 
-    
+
     /**
      * @see UserInterface
      */
@@ -190,7 +196,7 @@ class User implements UserInterface
         return $this;
     }
 
-   /**
+    /**
      * @see UserInterface
      */
     public function getRoles(): array
@@ -275,7 +281,7 @@ class User implements UserInterface
 
         return $this;
     }
-    
+
     /**
      * @return Collection|UserFriends[]
      */

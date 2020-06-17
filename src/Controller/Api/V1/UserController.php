@@ -14,7 +14,7 @@ use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Request;
-
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
  * @Route("/api/v1/users", name="api_v1_user_")
@@ -22,14 +22,17 @@ use Symfony\Component\HttpFoundation\Request;
 class UserController extends AbstractController
 {
 
-    private $normalizer;
+
+    private $objetNormalizer;
     private $encoder;
-    public function __construct(ObjectNormalizer $objetNormalizer, UserPasswordEncoderInterface $encoder)
+
+    public function __construct(ObjectNormalizer $objetNormalizer,UserPasswordEncoderInterface $encoder)
     {
         $this->normalizer = $objetNormalizer;
         $this->serializer = new Serializer([$objetNormalizer]);
         $this->encoder = $encoder;
     }
+
 
     /**
      *
@@ -39,14 +42,11 @@ class UserController extends AbstractController
     public function list(UserRepository $userRepository)
     {
         $users = $userRepository->findAll();
-        /// dd($users);
-
 
         $json = $this->serializer->normalize($users, null, ['groups' => 'api_v1_users']);
 
         return $this->json($json);
     }
-
 
     /**
      * @Route("/{id}", name="read", methods={"GET"})
@@ -54,13 +54,17 @@ class UserController extends AbstractController
     public function read(User $user)
     {
         return $this->json(
-            $this->serializer->normalize($user, null, ['groups' => ['api_v1_users']]));
+
+            $this->serializer->normalize($user, null, ['groups' => ['api_v1_users','api_v1_users_read']])
+        );
+
     }
 
 
     /**
-     * @Route("", name="new", methods={"POST"})
+     * @Route("", name="add", methods={"POST"})
      */
+
     public function new(Request $request, ObjectNormalizer $objetNormalizer)
     {
         // Depuis l'installation du JWT, on peut retrouver l'utilisateur connecté
@@ -86,9 +90,10 @@ class UserController extends AbstractController
 
         // L'option true (deuxième argument de json_decode(), permet de spécifier qu'on veut un arra yet pas un objet)
         $json = json_decode($request->getContent(), true);
-
+        //dd($json);
         // On simule l'envoi du formulaire
         $form->submit($json);
+
 
         // On vérifie que les données reçues sont valides selon les contraintes de validation qu'on connait
         if ($form->isValid()) {
@@ -113,6 +118,7 @@ class UserController extends AbstractController
             // Ce n'est pas du JSON, il y a sûrement un moyen, à la main, de sérialiser les erreurs mieux que ça
             // On précise également le code de status de réponse : 400
             // (string) c'est pour parser (transformer) notre objet en string
+
             ($form->getErrors(true));
 
             return $this->json((string)$form->getErrors(true), 400);
@@ -204,5 +210,3 @@ class UserController extends AbstractController
     }
 
 }
-
-
