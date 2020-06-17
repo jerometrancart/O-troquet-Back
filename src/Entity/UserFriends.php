@@ -6,6 +6,8 @@ use App\Repository\UserFriendsRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=UserFriendsRepository::class)
@@ -21,17 +23,19 @@ class UserFriends
 
      /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="friends")
-     * 
+     *
+     *
      */
     private $user;
 
     /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="friendsWithMe")
-     * 
+     *
+     *
      */
     private $friend; 
 
-    /**
+    /*
      * @ORM\Column(type="boolean")
      */
     private $is_requested;

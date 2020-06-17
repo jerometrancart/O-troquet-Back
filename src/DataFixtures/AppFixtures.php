@@ -17,7 +17,7 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager)
     {
-       
+        
         for ($i = 0; $i < 20; $i++) {
 
             $user = new User;
@@ -25,12 +25,12 @@ class AppFixtures extends Fixture
             $user->setUsername('user' . $i);
             $user->setPassword('root');
             $user->setAvatar('image' . $i);
-            $user->setRole('role');
+            $user->setRoles(["ROLE"]);
             $user->setIsActive(1);
             $user->setCreatedAt(new \DateTime('now'));
             $manager->persist($user);
 
-        }
+        } 
         for ($i = 0; $i < 5; $i++) {
             $achievement = new Achievement;
             $achievement->setPhrase('phrase'.$i);
@@ -49,7 +49,6 @@ class AppFixtures extends Fixture
         }
         
 
-        
         $manager->flush();
     }
 }
