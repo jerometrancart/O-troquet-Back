@@ -9,7 +9,7 @@ use App\Form\UserType;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
-
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -23,11 +23,12 @@ class UserController extends AbstractController
 {
 
     private $normalizer;
-
-    public function __construct(ObjectNormalizer $objetNormalizer)
+    private $encoder;
+    public function __construct(ObjectNormalizer $objetNormalizer, UserPasswordEncoderInterface $encoder)
     {
         $this->normalizer = $objetNormalizer;
         $this->serializer = new Serializer([$objetNormalizer]);
+        $this->encoder = $encoder;
     }
 
     /**
@@ -94,7 +95,7 @@ class UserController extends AbstractController
 
             // Ça y est, les données de la requête ont été associées à notre formulaire puis à $movie
             // Il ne reste plus qu'à persister $movie
-
+            $user->setPassword($this->encoder->encodePassword($user, $user->getPassword()));
             $em = $this->getDoctrine()->getManager();
             $em->persist($user);
             $em->flush();
@@ -135,8 +136,8 @@ class UserController extends AbstractController
         // On simule l'envoi du formulaire
         $form->submit($json);
         if ( $form->isValid()) {
-            //$user->setUpdatedAt(new \DateTime());
 
+            $user->setPassword($this->encoder->encodePassword($user, $user->getPassword()));
             $manager = $this->getDoctrine()->getManager();
             // Pas besoin de persist, l'objet manipulé est déjà connu du manager
             $manager->flush();
