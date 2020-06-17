@@ -119,26 +119,41 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/{id}/update", name="update", requirements={"id" = "\d+"}, methods={"PUT"})
+     * @Route("/{id}/update", name="update",  methods={"GET","POST"})
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, User $user, ObjectNormalizer $objetNormalizer)
     {
 
-        $form = $this->createForm(UserType::class, $user);
+        $form = $this->createForm(UserType::class, $user, ['csrf_protection' => false]);
 
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $user->setUpdatedAt(new \DateTime());
+        // L'option true (deuxième argument de json_decode(), permet de spécifier qu'on veut un arra yet pas un objet)
+        $json = json_decode($request->getContent(), true);
+
+        // On simule l'envoi du formulaire
+        $form->submit($json);
+        if ( $form->isValid()) {
+            //$user->setUpdatedAt(new \DateTime());
 
             $manager = $this->getDoctrine()->getManager();
             // Pas besoin de persist, l'objet manipulé est déjà connu du manager
             $manager->flush();
+            $serializer = new Serializer([$objetNormalizer]);
+            $userJson = $serializer->normalize($user, null, ['groups' => 'api_v1_users']);
+
+            // On précise le code de status de réponse 201 Created
+            return $this->json($userJson, 201);
+        } else {
+            // Si le formulaire n'est pas valide, on peut renvoyer les erreurs
+            // Attention il s'agit d'une chaine de caractères qui n'explique pas grand chose,
+            // Ce n'est pas du JSON, il y a sûrement un moyen, à la main, de sérialiser les erreurs mieux que ça
+            // On précise également le code de status de réponse : 400
+            // (string) c'est pour parser (transformer) notre objet en string
+            ($form->getErrors(true));
+            dd($form->getErrors(true));
+
+            return $this->json((string)$form->getErrors(true), 400);
 
         }
-        return $this->json([
-            'message' => 'votre compte a bien été modifié',
-            'path' => 'src/Controller/Api/V1/UserController.php',
-        ]);
     }
 
 
