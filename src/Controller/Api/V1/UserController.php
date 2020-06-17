@@ -183,7 +183,7 @@ class UserController extends AbstractController
 
 
 
-/**
+    /**
      * @Route("/{id}/banned", name="banned",methods={"GET","POST"})
      */
     public function banned($id)
@@ -192,8 +192,8 @@ class UserController extends AbstractController
         $user = $this->getDoctrine()->getRepository(User::class)->find($id);
         // je demande le manager
         $manager = $this->getDoctrine()->getManager();
-        // je dit au manager que cette entité devra faire l'objet d'une suppression
-      $user->setIsActive(false);
+
+        $user->setIsActive(false);
         // je demande au manager d'executer dans la BDD toute les modifications qui ont été faites sur les entités
         $manager->flush();
         return $this->json([
