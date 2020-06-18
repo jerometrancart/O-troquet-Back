@@ -28,9 +28,7 @@ class GameController extends AbstractController
     }
 
     /**
-     *
      * @Route("/", name="list")
-     *
      */
     public function list(GameRepository $gameRepository)
     {

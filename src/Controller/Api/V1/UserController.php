@@ -7,6 +7,7 @@ namespace App\Controller\Api\V1;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
+use App\Repository\PlayRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -51,10 +52,22 @@ class UserController extends AbstractController
     /**
      * @Route("/{id}", name="read", methods={"GET"})
      */
-    public function read(User $user)
+    public function read(User $user, Request $request)
     {
+
         return $this->json(
             $this->serializer->normalize($user, null, ['groups' => ['api_v1_users']]));
+    }
+
+    /**
+     * @Route("/{id}/stats", name="stats", methods={"GET"})
+     */
+    public function stats(User $user,Request $request)
+    {
+
+
+        return $this->json(
+            $this->serializer->normalize($user, null, ['groups' => ['api_v1_users_stat']]));
     }
 
 

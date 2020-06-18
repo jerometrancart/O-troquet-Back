@@ -29,12 +29,14 @@ class User implements UserInterface
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      * @Groups({"api_v1_users"})
+     * @Groups({"api_v1_users_stat"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=64)
      * @Groups({"api_v1_users"})
+     * @Groups({"api_v1_users_stat"})
      */
     private $email;
 
@@ -47,6 +49,7 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=64)
      * @Groups({"api_v1_users"})
+     * @Groups({"api_v1_users_stat"})
      */
     private $username;
 
@@ -106,8 +109,10 @@ class User implements UserInterface
     
     /**
      * @ORM\OneToMany(targetEntity=Play::class, mappedBy="user", orphanRemoval=true)
+     * @Groups({"api_v1_users"})
+     * @Groups({"api_v1_users_stat"})
      */
-    private $plays;
+    private $plays = [];
 
     public function __construct()
     {

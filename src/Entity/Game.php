@@ -18,12 +18,14 @@ class Game
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      * @Groups({"api_v1_game"})
+     * @Groups({"api_v1_users_stat"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=64)
      * @Groups({"api_v1_game"})
+     * @Groups({"api_v1_users_stat"})
      */
     private $name;
 
