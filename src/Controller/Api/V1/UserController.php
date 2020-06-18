@@ -70,6 +70,19 @@ class UserController extends AbstractController
             $this->serializer->normalize($user, null, ['groups' => ['api_v1_users_stat']]));
     }
 
+    /**
+     * @Route("/{id}/friends", name="friends", methods={"GET"})
+     */
+    public function friendsList(User $user,Request $request)
+    {
+
+
+        return $this->json(
+            $this->serializer->normalize($user, 'json', ['groups' => ['api_v1_users_friends']]));
+
+    }
+
+
 
     /**
      * @Route("", name="new", methods={"POST"})

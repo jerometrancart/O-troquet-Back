@@ -23,14 +23,13 @@ class UserFriends
 
      /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="friends")
-     *
-     *
+     * @Groups({"api_v1_users_friends"})
      */
     private $user;
 
     /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="friendsWithMe")
-     *
+     * @Groups({"api_v1_users_friends"})
      *
      */
     private $friend; 
