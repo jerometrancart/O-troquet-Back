@@ -9,8 +9,8 @@ use App\Form\UserType;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Doctrine\Persistence\ObjectManager;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,6 +37,7 @@ class UserController extends AbstractController
     /**
      *
      * @Route("/", name="list")
+     * @IsGranted("ROLE_USER")
      *
      */
     public function list(UserRepository $userRepository)
@@ -60,11 +61,10 @@ class UserController extends AbstractController
 
     }
 
-
     /**
      * @Route("", name="add", methods={"POST"})
+     * 
      */
-
     public function new(Request $request, ObjectNormalizer $objetNormalizer)
     {
         // Depuis l'installation du JWT, on peut retrouver l'utilisateur connecté
@@ -185,23 +185,16 @@ class UserController extends AbstractController
         ]);
     }
 
-
-
-
-
-
     /**
      * @Route("/{id}/banned", name="banned",methods={"GET","POST"})
      */
     public function banned($id)
     {
-        // je recupère mon entité
         $user = $this->getDoctrine()->getRepository(User::class)->find($id);
-        // je demande le manager
+
         $manager = $this->getDoctrine()->getManager();
 
         $user->setIsActive(false);
-        // je demande au manager d'executer dans la BDD toute les modifications qui ont été faites sur les entités
         $manager->flush();
         return $this->json([
             'message' => 'Vôtre compte à été banni',
