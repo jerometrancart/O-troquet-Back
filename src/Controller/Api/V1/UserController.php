@@ -7,6 +7,7 @@ namespace App\Controller\Api\V1;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -14,7 +15,6 @@ use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
  * @Route("/api/v1/users", name="api_v1_user_")
@@ -37,10 +37,12 @@ class UserController extends AbstractController
     /**
      *
      * @Route("/", name="list")
+     * 
      *
      */
     public function list(UserRepository $userRepository)
     {
+        
         $users = $userRepository->findAll();
 
         $json = $this->serializer->normalize($users, null, ['groups' => 'api_v1_users']);
@@ -63,6 +65,7 @@ class UserController extends AbstractController
 
     /**
      * @Route("", name="add", methods={"POST"})
+     * @IsGranted("ROLE_ADMIN")
      */
 
     public function new(Request $request, ObjectNormalizer $objetNormalizer)
@@ -130,6 +133,7 @@ class UserController extends AbstractController
 
     /**
      * @Route("/{id}/update", name="update",  methods={"GET","POST"})
+     * 
      */
     public function update(Request $request, User $user, ObjectNormalizer $objetNormalizer)
     {
@@ -168,6 +172,7 @@ class UserController extends AbstractController
 
     /**
      * @Route("/{id}", name="delete", methods={"DELETE"})
+     * 
      */
     public function delete($id)
     {
@@ -192,6 +197,7 @@ class UserController extends AbstractController
 
     /**
      * @Route("/{id}/banned", name="banned",methods={"GET","POST"})
+     * @IsGranted("ROLE_ADMIN")
      */
     public function banned($id)
     {
@@ -209,4 +215,14 @@ class UserController extends AbstractController
         ]);
     }
 
+
+     /**
+     * @Route("/{id}/stats", name="stats", methods={"GET"})
+     */
+    public function stats(User $user,Request $request)
+    {
+
+        return $this->json(
+            $this->serializer->normalize($user, null, ['groups' => ['api_v1_users_stat']]));
+    }
 }

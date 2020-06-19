@@ -1,12 +1,4 @@
 <?php
-
-/**
- * Created by PhpStorm.
- * User: hicham benkachoud
- * Date: 06/01/2020
- * Time: 20:39
- */
-
 namespace App\Controller\Api\V1;
 
 
@@ -25,6 +17,9 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 class AuthController extends ApiController
 {
+
+
+   
 
     /**
      * 
@@ -56,13 +51,4 @@ class AuthController extends ApiController
         }
     }
 
-    /**
-     * @param UserInterface $user
-     * @param JWTTokenManagerInterface $JWTManager
-     * @return JsonResponse
-     */
-    public function getTokenUser(UserInterface $user, JWTTokenManagerInterface $JWTManager)
-    {
-        return new JsonResponse(['token' => $JWTManager->create($user)]);
-    }
 }

@@ -1,11 +1,12 @@
 <?php
-
+//TODO:faire isGranted sur toutes les routes
 namespace App\Entity;
 
 use App\Repository\PlayRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=PlayRepository::class)
@@ -16,23 +17,27 @@ class Play
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
+     * @Groups({"api_v1_users_stat"})
      */
     private $id;
 
     
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"api_v1_users_stat"})
      */
     private $win;
 
     /**
      * @ORM\Column(type="datetime")
+     * 
      */
     private $date;
 
     /**
      * @ORM\ManyToOne(targetEntity=Game::class, inversedBy="plays")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"api_v1_users_stat"})
      */
     private $game;
 
