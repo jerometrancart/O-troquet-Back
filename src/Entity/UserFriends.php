@@ -24,15 +24,12 @@ class UserFriends
 
      /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="friends")
-      * @MaxDepth(10)
-     * @Groups({"api_v1_users_friends"})
      */
     private $user;
 
     /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="friendsWithMe")
      * @MaxDepth(4)
-     * @Groups({"api_v1_users_friends"})
      *
      */
     private $friend; 
@@ -76,6 +73,9 @@ class UserFriends
         return $this;
     }
 
+    /*
+     * @Groups({"api_v1_users_friends"})
+     */
     public function getUser(): ?User
     {
         return $this->user;

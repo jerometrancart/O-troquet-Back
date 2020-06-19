@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{ parent() }} - {{ achievement.phrase }}
+{% endblock %}
+
+{% block body %}
+    <table class="table">
+    <tbody>
+    <tr>
+        <th>Phrase</th>
+        <td>{{ achievement.phrase }}</td>
+    </tr>
+    <tr>
+        <th>Icon</th>
+        <td>{{ achievement.icon }}</td>
+    </tr>
+
+    </tbody>
+
+
+{% endblock %}

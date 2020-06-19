@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{ parent() }} - Jeux
+{% endblock %}
+
+{% block body %}
+    <h1 class="mt-5">Jeux</h1>
+    <div class="mt-5">
+
+
+        <div class="list-group">
+            {% for game in games %}
+                <a href="{{ path('game_view', {'id': game.id}) }}" class="list-group-item list-group-item-action">
+                    {{ game.name }}
+                </a>
+            {% endfor %}
+
+        </div>
+    </div>
+{% endblock %}
