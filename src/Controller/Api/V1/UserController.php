@@ -10,12 +10,12 @@ use App\Repository\UserRepository;
 use App\Repository\PlayRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Doctrine\Persistence\ObjectManager;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Request;
-
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
  * @Route("/api/v1/users", name="api_v1_user_")
@@ -23,9 +23,11 @@ use Symfony\Component\HttpFoundation\Request;
 class UserController extends AbstractController
 {
 
-    private $normalizer;
+
+    private $objetNormalizer;
     private $encoder;
-    public function __construct(ObjectNormalizer $objetNormalizer, UserPasswordEncoderInterface $encoder)
+
+    public function __construct(ObjectNormalizer $objetNormalizer,UserPasswordEncoderInterface $encoder)
     {
         $this->normalizer = $objetNormalizer;
         $this->serializer = new Serializer([$objetNormalizer]);
@@ -33,22 +35,21 @@ class UserController extends AbstractController
 
     }
 
+
     /**
      *
      * @Route("/", name="list")
+     * @IsGranted("ROLE_USER")
      *
      */
     public function list(UserRepository $userRepository)
     {
         $users = $userRepository->findAll();
-        /// dd($users);
-
 
         $json = $this->serializer->normalize($users, null, ['groups' => 'api_v1_users']);
 
         return $this->json($json);
     }
-
 
     /**
      * @Route("/{id}", name="read", methods={"GET"})
@@ -57,8 +58,7 @@ class UserController extends AbstractController
     {
 
         return $this->json(
-            $this->serializer->normalize($user, null, ['groups' => ['api_v1_users']]));
-    }
+
 
     /**
      * @Route("/{id}/stats", name="stats", methods={"GET"})
@@ -86,7 +86,8 @@ class UserController extends AbstractController
 
 
     /**
-     * @Route("", name="new", methods={"POST"})
+     * @Route("", name="add", methods={"POST"})
+     * 
      */
     public function new(Request $request, ObjectNormalizer $objetNormalizer)
     {
@@ -113,9 +114,10 @@ class UserController extends AbstractController
 
         // L'option true (deuxième argument de json_decode(), permet de spécifier qu'on veut un arra yet pas un objet)
         $json = json_decode($request->getContent(), true);
-
+        //dd($json);
         // On simule l'envoi du formulaire
         $form->submit($json);
+
 
         // On vérifie que les données reçues sont valides selon les contraintes de validation qu'on connait
         if ($form->isValid()) {
@@ -140,6 +142,7 @@ class UserController extends AbstractController
             // Ce n'est pas du JSON, il y a sûrement un moyen, à la main, de sérialiser les erreurs mieux que ça
             // On précise également le code de status de réponse : 400
             // (string) c'est pour parser (transformer) notre objet en string
+
             ($form->getErrors(true));
 
             return $this->json((string)$form->getErrors(true), 400);
@@ -206,23 +209,16 @@ class UserController extends AbstractController
         ]);
     }
 
-
-
-
-
-
     /**
      * @Route("/{id}/banned", name="user_banned",methods={"GET","POST"})
      */
     public function banned($id)
     {
-        // je recupère mon entité
         $user = $this->getDoctrine()->getRepository(User::class)->find($id);
-        // je demande le manager
+
         $manager = $this->getDoctrine()->getManager();
 
         $user->setIsActive(false);
-        // je demande au manager d'executer dans la BDD toute les modifications qui ont été faites sur les entités
         $manager->flush();
         return $this->json([
             'message' => 'Vôtre compte à été banni',
@@ -231,5 +227,3 @@ class UserController extends AbstractController
     }
 
 }
-
-
