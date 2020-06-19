@@ -30,6 +30,7 @@ class UserController extends AbstractController
         $this->normalizer = $objetNormalizer;
         $this->serializer = new Serializer([$objetNormalizer]);
         $this->encoder = $encoder;
+
     }
 
     /**
@@ -211,7 +212,7 @@ class UserController extends AbstractController
 
 
     /**
-     * @Route("/{id}/banned", name="banned",methods={"GET","POST"})
+     * @Route("/{id}/banned", name="user_banned",methods={"GET","POST"})
      */
     public function banned($id)
     {
