@@ -22,16 +22,21 @@ security:
                 failure_handler:          lexik_jwt_authentication.handler.authentication_failure
         users:
             pattern:   ^/api/v1/users
-            methods: [PUT, PATCH, DELETE]
             stateless: true
             guard:
                 authenticators:
-                    - lexik_jwt_authentication.jwt_token_authenticator    
+                    - lexik_jwt_authentication.jwt_token_authenticator
         #C/C pour rajouter des "endpoint" protegés
         main:
             anonymous: true
             lazy: true
             provider: app_user_provider
+            guard:
+                authenticators:
+                    - App\Security\LoginFormAuthenticator
+            logout:
+                path: app_logout
+
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#firewalls-authentication
@@ -47,3 +52,11 @@ security:
         - { path: ^api/register, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/users, roles: IS_AUTHENTICATED_FULLY, methods:[PUT, PATCH, DELETE]}
+        - { path: ^/(login|register), roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: '(update|banned|unbanned|edit)', roles: ROLE_ADMIN }
+        - { path: ^/\w+, roles: ROLE_USER }
+
+    role_hierarchy:
+     ROLE_SUPER_ADMIN: ROLE_ADMIN
+     ROLE_ADMIN: ROLE_USER

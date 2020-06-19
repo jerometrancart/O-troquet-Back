@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Votre profil{% endblock %}
+
+{% block body %}
+    <h1>Votre profil</h1>
+
+    <table class="table">
+        <tbody>
+        <tr>
+            <th>Email</th>
+            <td>{{ app.user.username }}</td>
+            <th>Role</th>
+            <td>{% for role in app.user.roles %}
+                    <li>{{ role }}</li>
+                {% endfor %}</td>
+        </tr>
+
+        </tbody>
+
+    </table>
+
+    <div >
+        <a class="btn btn-warning" href=" {{ path('security_update', {'id': app.user.id}) }}">Modifier</a>
+        <a href="{{ path('security_delete', {'id': app.user.id}) }}" class="btn btn-danger" onclick="return confirm('Confirmez la suppression')">
+            Supprimer
+        </a>
+    </div>
+    <div>
+        <a class="btn btn-primary" href="{{ path('homepage') }}">Revenir a l'accueil</a>
+    </div>
+
+{% endblock %}

@@ -17,28 +17,51 @@
 </head>
 
 <body>
-<nav class="navbar navbar-expand-lg  navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg  navbar-light bg-light">
     <a class="navbar-brand" href="{{ path('homepage') }}">
         <img src="{{ asset('images/jeu-des.png') }}" width="30" height="30" class="d-inline-block align-top">
         O'Troquet
     </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
-            aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav mr-auto">
-            <a class="nav-item nav-link" href="{{ path('game_list') }}">Game</a>
-            <a class="nav-item nav-link" href="#">Achievement</a>
-            <a class="nav-item nav-link" href="{{ path('user_index') }}">User</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+                aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav mr-auto">
+                <a class="nav-item nav-link" href="{{ path('game_list') }}">Game</a>
+                <a class="nav-item nav-link" href="{{ path('achievement_list') }}">Achievement</a>
+                <a class="nav-item nav-link" href="{{ path('user_index') }}">User</a>
 
-            <div class="nav-item dropdown">
+                <div class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-user" aria-hidden="true"></i>
+                        {% if app.user %}
+                            {{ app.user.email }}
+                        {% endif %}
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        {% if app.user %}
+                            <span class="dropdown-item">
+                                {% if "ROLE_ADMIN" in app.user.roles %}
+                                    Administrateur
+                                {% else %}
+                                    Utilisateur
+                                {% endif %}
+                            </span>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{{ path('app_logout') }}">Déconnexion</a>
 
+                        {% else %}
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{{ path('app_login') }}">Connexion</a>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-        </div>
 
-    </div>
-</nav>
+        </div>
+    </nav>
+    <div class="container">
 
 
     {% block body %}{% endblock %}
