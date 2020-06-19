@@ -17,19 +17,25 @@ class Achievement
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"api_v1_achievement"})
+
+     * @Groups({"api_v1_users_read"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=64)
-     * @Groups({"api_v1_achievement"})
+
+     * *@Groups({"api_v1_users_read"})
+
+
      */
     private $phrase;
 
     /**
      * @ORM\Column(type="string", length=64)
-     * @Groups({"api_v1_achievement"})
+
+     * @Groups({"api_v1_users_read"})
+
      */
     private $icon;
 
