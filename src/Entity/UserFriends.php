@@ -36,31 +36,21 @@ class UserFriends
      */
     private $friend;
 
-    /*
-     * @ORM\Column(type="boolean")
-     */
-    private $is_requested;
-
+   
     /**
      * @ORM\Column(type="boolean")
      */
     private $is_accepted;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $is_requested;
+
+
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getIsRequested(): ?bool
-    {
-        return $this->is_requested;
-    }
-
-    public function setIsRequested(bool $is_requested): self
-    {
-        $this->is_requested = $is_requested;
-
-        return $this;
     }
 
     public function getIsAccepted(): ?bool
@@ -95,6 +85,18 @@ class UserFriends
     public function setFriend(?User $friend): self
     {
         $this->friend = $friend;
+
+        return $this;
+    }
+
+    public function getIsRequested(): ?bool
+    {
+        return $this->is_requested;
+    }
+
+    public function setIsRequested(bool $is_requested): self
+    {
+        $this->is_requested = $is_requested;
 
         return $this;
     }
