@@ -23,6 +23,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
  * @UniqueEntity(
  *     fields={"email"},
  *     message="Un email existe déjà avec ce libellé")
+ * @UniqueEntity(
+ *     fields={"username"},
+ *     message="Un utilisateur existe déjà avec ce libellé")
  */
 class User implements UserInterface
 {
@@ -32,6 +35,10 @@ class User implements UserInterface
      * @ORM\Column(type="integer")
      * @Groups({"api_v1_users"})
      * @Groups({"api_v1_users_stat"})
+<<<<<<< HEAD
+=======
+     * 
+>>>>>>> fixSecureAPI
      */
     private $id;
 
@@ -57,7 +64,10 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=64)
      * @Groups({"api_v1_users"})
      * @Groups({"api_v1_users_stat"})
+<<<<<<< HEAD
      * @MaxDepth(4)
+=======
+>>>>>>> fixSecureAPI
      */
     private $username;
 
@@ -105,7 +115,6 @@ class User implements UserInterface
      * The people who think that I’m their friend.
      *
      * @ORM\OneToMany(targetEntity="UserFriends", mappedBy="friend") 
-
      * @Groups({"api_v1_users"})
      */
     private $friendsWithMe;

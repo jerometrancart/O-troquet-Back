@@ -44,6 +44,7 @@ class Game
     /**
      * @ORM\OneToMany(targetEntity=Play::class, mappedBy="game", orphanRemoval=true, cascade={"persist"})
      * @Groups({"api_v1_game"})
+     * 
      */
     private $plays;
 

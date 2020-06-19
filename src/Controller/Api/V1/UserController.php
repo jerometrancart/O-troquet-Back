@@ -5,6 +5,7 @@ namespace App\Controller\Api\V1;
 
 
 use App\Entity\User;
+use App\Entity\UserFriends;
 use App\Form\UserType;
 use App\Repository\UserRepository;
 use App\Repository\PlayRepository;
@@ -15,7 +16,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
  * @Route("/api/v1/users", name="api_v1_user_")
@@ -27,7 +27,7 @@ class UserController extends AbstractController
     private $objetNormalizer;
     private $encoder;
 
-    public function __construct(ObjectNormalizer $objetNormalizer,UserPasswordEncoderInterface $encoder)
+    public function __construct(ObjectNormalizer $objetNormalizer, UserPasswordEncoderInterface $encoder)
     {
         $this->normalizer = $objetNormalizer;
         $this->serializer = new Serializer([$objetNormalizer]);
@@ -35,15 +35,48 @@ class UserController extends AbstractController
 
     }
 
+    /**
+     *
+     * add friends 
+     * @Route("/{id}/requests/{id2}/friends", requirements={"id" = "\d+","id2" = "\d+"}, name="li")
+     * 
+     * 
+     *
+     */
+    public function friendRequest(User $user, $id2)
+    {
+
+
+        $friend = $this->getDoctrine()->getRepository(User::class)->find($id2);
+        $manager = $this->getDoctrine()->getManager();
+
+        $addNewRelation = new UserFriends;
+        $addNewRelation->setUser($user);
+        $addNewRelation->setFriend($friend);
+        $addNewRelation->setIsRequested(true);
+        $addNewRelation->setIsAccepted(true);
+        $manager->persist($addNewRelation);
+
+        // je demande au manager d'executer dans la BDD toute les modifications qui ont été faites sur les entités
+        $manager->flush();
+        return $this->json([
+            'message' => 'Votre compte à été banni',
+        ]);
+    } 
+
+
+
+
+
 
     /**
      *
      * @Route("/", name="list")
-     * @IsGranted("ROLE_USER")
      *
      */
     public function list(UserRepository $userRepository)
     {
+
         $users = $userRepository->findAll();
 
         $json = $this->serializer->normalize($users, null, ['groups' => 'api_v1_users']);
@@ -58,17 +91,8 @@ class UserController extends AbstractController
     {
 
         return $this->json(
-
-
-    /**
-     * @Route("/{id}/stats", name="stats", methods={"GET"})
-     */
-    public function stats(User $user,Request $request)
-    {
-
-
-        return $this->json(
-            $this->serializer->normalize($user, null, ['groups' => ['api_v1_users_stat']]));
+            $this->serializer->normalize($user, null, ['groups' => ['api_v1_users', 'api_v1_users_read']])
+        );
     }
 
     /**
@@ -87,7 +111,7 @@ class UserController extends AbstractController
 
     /**
      * @Route("", name="add", methods={"POST"})
-     * 
+     * @IsGranted("ROLE_ADMIN")
      */
     public function new(Request $request, ObjectNormalizer $objetNormalizer)
     {
@@ -145,7 +169,7 @@ class UserController extends AbstractController
 
             ($form->getErrors(true));
 
-            return $this->json((string)$form->getErrors(true), 400);
+            return $this->json((string) $form->getErrors(true), 400);
         }
     }
 
@@ -154,6 +178,7 @@ class UserController extends AbstractController
 
     /**
      * @Route("/{id}/update", name="update",  methods={"GET","POST"})
+     * 
      */
     public function update(Request $request, User $user, ObjectNormalizer $objetNormalizer)
     {
@@ -165,7 +190,7 @@ class UserController extends AbstractController
 
         // On simule l'envoi du formulaire
         $form->submit($json);
-        if ( $form->isValid()) {
+        if ($form->isValid()) {
 
             $user->setPassword($this->encoder->encodePassword($user, $user->getPassword()));
             $manager = $this->getDoctrine()->getManager();
@@ -184,14 +209,14 @@ class UserController extends AbstractController
             // (string) c'est pour parser (transformer) notre objet en string
             ($form->getErrors(true));
 
-            return $this->json((string)$form->getErrors(true), 400);
-
+            return $this->json((string) $form->getErrors(true), 400);
         }
     }
 
 
     /**
      * @Route("/{id}", name="delete", methods={"DELETE"})
+     * 
      */
     public function delete($id)
     {
@@ -209,8 +234,10 @@ class UserController extends AbstractController
         ]);
     }
 
+
     /**
-     * @Route("/{id}/banned", name="user_banned",methods={"GET","POST"})
+     * @Route("/{id}/banned", name="banned",methods={"GET","POST"})
+     * @IsGranted("ROLE_ADMIN")
      */
     public function banned($id)
     {
@@ -226,4 +253,14 @@ class UserController extends AbstractController
         ]);
     }
 
+    /**
+     * @Route("/{id}/stats", name="stats", methods={"GET"})
+     */
+    public function stats(User $user, Request $request)
+    {
+
+        return $this->json(
+            $this->serializer->normalize($user, null, ['groups' => ['api_v1_users_stat']])
+        );
+    }
 }

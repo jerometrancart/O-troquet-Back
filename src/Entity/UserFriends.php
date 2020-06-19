@@ -21,8 +21,10 @@ class UserFriends
      * @ORM\Column(type="integer")
      */
     private $id;
-
-     /**
+    
+    //*@MaxDepth(2)
+    
+    /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="friends")
      */
     private $user;
@@ -32,33 +34,23 @@ class UserFriends
      * @MaxDepth(4)
      *
      */
-    private $friend; 
+    private $friend;
 
-    /*
-     * @ORM\Column(type="boolean")
-     */
-    private $is_requested;
-
+   
     /**
      * @ORM\Column(type="boolean")
      */
     private $is_accepted;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $is_requested;
+
+
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getIsRequested(): ?bool
-    {
-        return $this->is_requested;
-    }
-
-    public function setIsRequested(bool $is_requested): self
-    {
-        $this->is_requested = $is_requested;
-
-        return $this;
     }
 
     public function getIsAccepted(): ?bool
@@ -99,5 +91,16 @@ class UserFriends
 
         return $this;
     }
-    
+
+    public function getIsRequested(): ?bool
+    {
+        return $this->is_requested;
+    }
+
+    public function setIsRequested(bool $is_requested): self
+    {
+        $this->is_requested = $is_requested;
+
+        return $this;
+    }
 }

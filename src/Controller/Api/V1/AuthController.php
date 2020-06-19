@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Controller\Api\V1;
 
 
@@ -18,6 +17,9 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 class AuthController extends ApiController
 {
+
+
+   
 
     /**
      * 
