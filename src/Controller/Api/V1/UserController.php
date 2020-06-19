@@ -7,6 +7,7 @@ namespace App\Controller\Api\V1;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
+use App\Repository\PlayRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\Persistence\ObjectManager;
@@ -31,6 +32,7 @@ class UserController extends AbstractController
         $this->normalizer = $objetNormalizer;
         $this->serializer = new Serializer([$objetNormalizer]);
         $this->encoder = $encoder;
+
     }
 
 
@@ -52,14 +54,36 @@ class UserController extends AbstractController
     /**
      * @Route("/{id}", name="read", methods={"GET"})
      */
-    public function read(User $user)
+    public function read(User $user, Request $request)
     {
+
         return $this->json(
 
-            $this->serializer->normalize($user, null, ['groups' => ['api_v1_users','api_v1_users_read']])
-        );
+
+    /**
+     * @Route("/{id}/stats", name="stats", methods={"GET"})
+     */
+    public function stats(User $user,Request $request)
+    {
+
+
+        return $this->json(
+            $this->serializer->normalize($user, null, ['groups' => ['api_v1_users_stat']]));
+    }
+
+    /**
+     * @Route("/{id}/friends", name="friends", methods={"GET"})
+     */
+    public function friendsList(User $user,Request $request)
+    {
+
+
+        return $this->json(
+            $this->serializer->normalize($user, 'json', ['groups' => ['api_v1_users_friends']]));
 
     }
+
+
 
     /**
      * @Route("", name="add", methods={"POST"})
@@ -186,7 +210,7 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/{id}/banned", name="banned",methods={"GET","POST"})
+     * @Route("/{id}/banned", name="user_banned",methods={"GET","POST"})
      */
     public function banned($id)
     {

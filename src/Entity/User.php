@@ -9,6 +9,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
+
 use Symfony\Component\Security\Core\User\UserInterface;
 
 
@@ -29,12 +31,17 @@ class User implements UserInterface
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      * @Groups({"api_v1_users"})
+     * @MaxDepth(4)
+     * @Groups({"api_v1_users_stat"})
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=64)
      * @Groups({"api_v1_users"})
+     * @MaxDepth(4)
+     * @Groups({"api_v1_users_stat"})
+     * @Groups({"api_v1_users_friends"})
      */
     private $email;
 
@@ -52,12 +59,16 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=64)
      * @Groups({"api_v1_users"})
+     * @Groups({"api_v1_users_stat"})
+     * @MaxDepth(4)
+     * @Groups({"api_v1_users_friends"})
      */
     private $username;
 
     /**
      * @ORM\Column(type="string", length=64, nullable=true)
      * @Groups({"api_v1_users"})
+     * @Groups({"api_v1_users_friends"})
      */
     private $avatar;
 
@@ -89,16 +100,20 @@ class User implements UserInterface
     /**
      * The people who I think are my friends.
      *
-     *@ORM\OneToMany(targetEntity="UserFriends", mappedBy="user")
-     *@Groups({"api_v1_users_read"})
-     */
+
+     * @ORM\OneToMany(targetEntity="UserFriends", mappedBy="user")
+     * @Groups({"api_v1_users"})
+     * @MaxDepth(4)
+     * @Groups({"api_v1_users_friends"})
+     */ 
     private $friends;
 
     /**
      * The people who think that I’m their friend.
      *
      * @ORM\OneToMany(targetEntity="UserFriends", mappedBy="friend") 
-     *@Groups({"api_v1_users_read"})
+
+     * @Groups({"api_v1_users"})
      */
     private $friendsWithMe;
 
@@ -112,8 +127,11 @@ class User implements UserInterface
 
     /**
      * @ORM\OneToMany(targetEntity=Play::class, mappedBy="user", orphanRemoval=true)
+     * @Groups({"api_v1_users"})
+     * @MaxDepth(4)
+     * @Groups({"api_v1_users_stat"})
      */
-    private $plays;
+    private $plays = [];
 
     public function __construct()
     {

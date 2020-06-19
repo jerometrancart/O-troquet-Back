@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{ parent() }} - {{ game.name }}
+{% endblock %}
+
+{% block body %}
+    <table class="table">
+    <tbody>
+    <tr>
+        <th>Name</th>
+        <td>{{ game.name }}</td>
+    </tr>
+    <tr>
+        <th>Icon</th>
+        <td>{{ game.icon }}</td>
+    </tr>
+
+    </tbody>
+
+
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{ parent() }} - Achievement
+{% endblock %}
+
+{% block body %}
+    <h1 class="mt-5">Achievement</h1>
+    <div class="mt-5">
+
+
+        <div class="list-group">
+            {% for achievement in achievements %}
+                <a href="{{ path('achievement_view', {'id': achievement.id}) }}" class="list-group-item list-group-item-action">
+                    {{ achievement.phrase }}
+                </a>
+            {% endfor %}
+
+        </div>
+    </div>
+{% endblock %}

@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -23,14 +24,15 @@ class UserFriends
 
      /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="friends")
-     *
-     *
+      * @MaxDepth(10)
+     * @Groups({"api_v1_users_friends"})
      */
     private $user;
 
     /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="friendsWithMe")
-     *
+     * @MaxDepth(4)
+     * @Groups({"api_v1_users_friends"})
      *
      */
     private $friend; 
