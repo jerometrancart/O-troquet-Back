@@ -53,8 +53,6 @@ security:
             # form_login: true
             # https://symfony.com/doc/current/security/form_login_setup.html
 
-            provider: our_db_provider
-
             form_login:
                 login_path: login
                 check_path: login
