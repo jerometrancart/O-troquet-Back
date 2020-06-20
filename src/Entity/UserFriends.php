@@ -45,7 +45,7 @@ class UserFriends
     /**
      * @ORM\Column(type="boolean")
      */
-    private $is_requested;
+    private $isContested;
 
 
     public function getId(): ?int
@@ -100,6 +100,18 @@ class UserFriends
     public function setIsRequested(bool $is_requested): self
     {
         $this->is_requested = $is_requested;
+
+        return $this;
+    }
+
+    public function getIsContested(): ?bool
+    {
+        return $this->isContested;
+    }
+
+    public function setIsContested(bool $isContested): self
+    {
+        $this->isContested = $isContested;
 
         return $this;
     }

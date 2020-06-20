@@ -36,6 +36,7 @@ class UserController extends AbstractController
 
     }
 
+   
     /**
      *
      * add friends 
@@ -47,24 +48,32 @@ class UserController extends AbstractController
     public function friendRequest(User $user, $id2)
     {
 
-
         $friend = $this->getDoctrine()->getRepository(User::class)->find($id2);
         $manager = $this->getDoctrine()->getManager();
 
+        
+        //add first lign for friend relation
         $addNewRelation = new UserFriends;
         $addNewRelation->setUser($user);
         $addNewRelation->setFriend($friend);
-        $addNewRelation->setIsRequested(true);
-        $addNewRelation->setIsAccepted(true);
-        $manager->persist($addNewRelation);
+        $addNewRelation->setIsContested(true);
+        $addNewRelation->setIsAccepted(false);
 
-        // je demande au manager d'executer dans la BDD toute les modifications qui ont été faites sur les entités
+        //add second lign for same friend relation
+        $manager->persist($addNewRelation);
+        $addNewRelation2 = new UserFriends;
+        $addNewRelation2->setUser($friend);
+        $addNewRelation2->setFriend($user);
+        $addNewRelation2->setIsContested(false);
+        $addNewRelation2->setIsAccepted(false);
+
+
+        $manager->persist($addNewRelation2);
         $manager->flush();
         return $this->json([
-            'message' => 'Votre compte à été banni',
-        ]);
-    } 
-
+            'message' => '',
+        ], 201);
+    }
 
 
 
