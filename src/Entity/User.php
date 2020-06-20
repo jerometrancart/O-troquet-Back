@@ -10,7 +10,6 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
-
 use Symfony\Component\Security\Core\User\UserInterface;
 
 
@@ -35,10 +34,6 @@ class User implements UserInterface
      * @ORM\Column(type="integer")
      * @Groups({"api_v1_users"})
      * @Groups({"api_v1_users_stat"})
-<<<<<<< HEAD
-=======
-     * 
->>>>>>> fixSecureAPI
      */
     private $id;
 
@@ -64,10 +59,7 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=64)
      * @Groups({"api_v1_users"})
      * @Groups({"api_v1_users_stat"})
-<<<<<<< HEAD
      * @MaxDepth(4)
-=======
->>>>>>> fixSecureAPI
      */
     private $username;
 
