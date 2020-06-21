@@ -101,7 +101,7 @@ class UserController extends AbstractController
     {
 
         return $this->json(
-            $this->serializer->normalize($user, null, ['groups' => ['api_v1_users', 'api_v1_users_read']])
+            $this->serializer->normalize($user, null, ['groups' => ['api_v1_users', 'api_v1_us',]])
         );
     }
 

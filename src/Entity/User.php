@@ -48,10 +48,10 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=255)
      * 
-     * @Groups({"api_v1_users"})
+     * @Groups({"api_v1_users_read"})
      * 
      * * @Assert\NotBlank(message="New password can not be blank.")
-     *  @Assert\Regex(pattern="/^(?=.*[a-z])(?=.*\d).{6,}$/i", message="New password is required to be minimum 6 chars in length and to include at least one letter and one number.")
+     *  @Assert\Regex(pattern="/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/i", message="New password is required to be minimum 6 chars in length and to include at least one letter and one number.")
      */
     private $password;
 
@@ -99,7 +99,7 @@ class User implements UserInterface
      *
 
      * @ORM\OneToMany(targetEntity="UserFriends", mappedBy="user")
-     * @Groups({"api_v1_users"})
+     * @Groups({"api_v1_users_read"})
      */ 
     private $friends;
 
@@ -107,7 +107,6 @@ class User implements UserInterface
      * The people who think that I’m their friend.
      *
      * @ORM\OneToMany(targetEntity="UserFriends", mappedBy="friend") 
-     * @Groups({"api_v1_users"})
      */
     private $friendsWithMe;
 
@@ -121,7 +120,6 @@ class User implements UserInterface
 
     /**
      * @ORM\OneToMany(targetEntity=Play::class, mappedBy="user", orphanRemoval=true)
-     * @Groups({"api_v1_users"})
      * @Groups({"api_v1_users_stat"})
      */
     private $plays = [];
