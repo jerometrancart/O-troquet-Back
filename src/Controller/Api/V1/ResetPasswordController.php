@@ -170,13 +170,9 @@ class ResetPasswordController extends ApiController
                 'There was a problem handling your password reset request - %s',
                 $e->getReason()
             ));
-
-            
-
-           
+                
         }
        
-
         $email = (new TemplatedEmail())
             ->from(new Address('essaiphpmailer@gmail.com', 'Ne pas répondre'))
             ->to($user->getEmail())
