@@ -47,7 +47,7 @@ class UserController extends AbstractController
         // je demande le manager
         $manager = $this->getDoctrine()->getManager();
 
-        $user->setIsActive(false);
+        $user->setIsBanned(true);
 
         // je demande au manager d'executer dans la BDD toute les modifications qui ont été faites sur les entités
         $manager->flush();
@@ -84,7 +84,7 @@ class UserController extends AbstractController
         // je demande le manager
         $manager = $this->getDoctrine()->getManager();
 
-        $user->setIsActive(true);
+        $user->setIsBanned(false);
         // je demande au manager d'executer dans la BDD toute les modifications qui ont été faites sur les entités
         $manager->flush();
 

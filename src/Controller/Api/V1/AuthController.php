@@ -37,12 +37,14 @@ class AuthController extends ApiController
         $this->resetPasswordHelper = $resetPasswordHelper;
     }
 
+
+
     /**
      * 
      * @Route("/api/register", name="api_register", methods={"POST"})
      * 
      */
-    public function register(MailerInterface $mailer, Request $request, UserPasswordEncoderInterface $encoder,MailerService $mailerService)
+    public function register(MailerInterface $mailer, Request $request, UserPasswordEncoderInterface $encoder, MailerService $mailerService)
     {
 
         $user = new User;
