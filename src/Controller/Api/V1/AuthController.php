@@ -89,10 +89,7 @@ class AuthController extends ApiController
      */
     public function confirmAccount($token, $username): Response
     {
-
-
-
-
+        
         //dd($username, $token);
 
         $em = $this->getDoctrine()->getManager();

@@ -65,7 +65,6 @@ class ResetPasswordController extends ApiController
            // dd($form->getErrors());
             return $this->json((string) $form->getErrors(true), 400);
         }
-
     }
 
     /**
