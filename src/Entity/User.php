@@ -124,10 +124,15 @@ class User implements UserInterface
      */
     private $plays = [];
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $confirmationToken;
+
     public function __construct()
     {
         $this->created_at = new \DateTime();
-        $this->is_active = true;
+        $this->is_active = false;
         $this->friends = new ArrayCollection();
         $this->friendsWithMe = new ArrayCollection();
         $this->achievements = new ArrayCollection();
@@ -377,6 +382,18 @@ class User implements UserInterface
                 $play->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getConfirmationToken(): ?string
+    {
+        return $this->confirmationToken;
+    }
+
+    public function setConfirmationToken(?string $confirmationToken): self
+    {
+        $this->confirmationToken = $confirmationToken;
 
         return $this;
     }
