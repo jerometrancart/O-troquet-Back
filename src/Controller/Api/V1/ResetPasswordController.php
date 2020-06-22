@@ -179,7 +179,7 @@ class ResetPasswordController extends ApiController
         $tokenLifeTime = $this->resetPasswordHelper->getTokenLifetime();
       
     
-        $mailer->send($email); */
+        $mailer->send($email); 
         $mailerService->sendToken($resetToken,$email,$username,$tokenLifeTime,'Your password reset request','reset_password/email.html.twig');
     
 
