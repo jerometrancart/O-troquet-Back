@@ -6,6 +6,7 @@ namespace App\Controller\Api\V1;
 use App\Entity\User;
 use App\Controller\Api\V1\ApiController;
 use App\Form\RegistrationFormType;
+use App\Service\MailerService;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,19 +19,30 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use SymfonyCasts\Bundle\ResetPassword\Controller\ResetPasswordControllerTrait;
+use SymfonyCasts\Bundle\ResetPassword\ResetPasswordHelperInterface;
+
 
 class AuthController extends ApiController
 {
 
 
 
+    use ResetPasswordControllerTrait;
+
+    private $resetPasswordHelper;
+
+    public function __construct(ResetPasswordHelperInterface $resetPasswordHelper)
+    {
+        $this->resetPasswordHelper = $resetPasswordHelper;
+    }
 
     /**
      * 
      * @Route("/api/register", name="api_register", methods={"POST"})
      * 
      */
-    public function register(MailerInterface $mailer,Request $request, UserPasswordEncoderInterface $encoder)
+    public function register(MailerInterface $mailer, Request $request, UserPasswordEncoderInterface $encoder,MailerService $mailerService)
     {
 
         $user = new User;
@@ -50,19 +62,14 @@ class AuthController extends ApiController
             $em->persist($user);
             $em->flush();
 
-            $username = $user->getUsername();
-            $email = (new TemplatedEmail())
-                ->from(new Address('essaiphpmailer@gmail.com', 'Ne pas répondre'))
-                ->to($user->getEmail())
-                ->subject('Your password reset request')
-                ->htmlTemplate('registration/email.html.twig')
-                ->context([
-                    'Token' => $confirmationToken,
-                    'username' => $username,
-                    'tokenLifetime' => 3600,
-                ]);
 
-                $mailer->send($email);
+            $to = $user->getEmail();
+            $username = $user->getUsername();
+            $tokenLifeTime = $this->resetPasswordHelper->getTokenLifetime();
+            $username = $user->getUsername();
+
+
+            $mailerService->sendToken($confirmationToken, $to, $username, $tokenLifeTime, 'Confirmation ', 'registration/email.html.twig');
 
             return $this->respondWithSuccess(sprintf('Votre inscription a été validée, vous aller recevoir un email de confirmation pour activer votre compte et pouvoir vous connecter', $user->getUsername()));
         } else {
@@ -89,15 +96,15 @@ class AuthController extends ApiController
         $em = $this->getDoctrine()->getManager();
         $user = $em->getRepository(User::class)->findOneBy(['username' => $username]);
         $tokenExist = $user->getConfirmationToken();
-        if($token === $tokenExist) {
-           $user->setConfirmationToken(null);
-           $user->setIsActive(true);
-           $em->persist($user);
-           $em->flush();
-        
-           // TODO: Change Url
-           //return $this->redirect('http://adressedusite.com');
-           return $this->redirectToRoute('app_login');
+        if ($token === $tokenExist) {
+            $user->setConfirmationToken(null);
+            $user->setIsActive(true);
+            $em->persist($user);
+            $em->flush();
+
+            // TODO: Change Url
+            //return $this->redirect('http://adressedusite.com');
+            return $this->redirectToRoute('app_login');
         } else {
             return $this->render('registration/token-expire.html.twig');
         }
