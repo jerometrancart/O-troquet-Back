@@ -21,7 +21,8 @@ public function onAuthenticationSuccessResponse(AuthenticationSuccessEvent $even
     }
 
     $data['data'] = array(
-        'active' => $user->getIsActive()
+        'active' => $user->getIsActive(),
+        'banned' => $user->getIsBanned()
     );
     
     $event->setData($data);

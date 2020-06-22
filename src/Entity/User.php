@@ -48,10 +48,10 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=255)
      * 
-     * @Groups({"api_v1_users"})
+     * @Groups({"api_v1_users_read"})
      * 
      * * @Assert\NotBlank(message="New password can not be blank.")
-     *  @Assert\Regex(pattern="/^(?=.*[a-z])(?=.*\d).{6,}$/i", message="New password is required to be minimum 6 chars in length and to include at least one letter and one number.")
+     *  @Assert\Regex(pattern="/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/i", message="New password is required to be minimum 6 chars in length and to include at least one letter and one number and one special character.")
      */
     private $password;
 
@@ -99,7 +99,7 @@ class User implements UserInterface
      *
 
      * @ORM\OneToMany(targetEntity="UserFriends", mappedBy="user")
-     * @Groups({"api_v1_users"})
+     * @Groups({"api_v1_users_read"})
      */ 
     private $friends;
 
@@ -107,7 +107,6 @@ class User implements UserInterface
      * The people who think that I’m their friend.
      *
      * @ORM\OneToMany(targetEntity="UserFriends", mappedBy="friend") 
-     * @Groups({"api_v1_users"})
      */
     private $friendsWithMe;
 
@@ -121,21 +120,31 @@ class User implements UserInterface
 
     /**
      * @ORM\OneToMany(targetEntity=Play::class, mappedBy="user", orphanRemoval=true)
-     * @Groups({"api_v1_users"})
      * @Groups({"api_v1_users_stat"})
      */
     private $plays = [];
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $confirmationToken;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $is_banned;
+
+
     public function __construct()
     {
         $this->created_at = new \DateTime();
-        $this->is_active = true;
+        $this->is_active = false;
+        $this->is_banned = false;
         $this->friends = new ArrayCollection();
         $this->friendsWithMe = new ArrayCollection();
         $this->achievements = new ArrayCollection();
         $this->plays = new ArrayCollection();
     }
-
 
     /**
      * @see UserInterface
@@ -379,6 +388,30 @@ class User implements UserInterface
                 $play->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getConfirmationToken(): ?string
+    {
+        return $this->confirmationToken;
+    }
+
+    public function setConfirmationToken(?string $confirmationToken): self
+    {
+        $this->confirmationToken = $confirmationToken;
+
+        return $this;
+    }
+
+    public function getIsBanned(): ?bool
+    {
+        return $this->is_banned;
+    }
+
+    public function setIsBanned(bool $is_banned): self
+    {
+        $this->is_banned = $is_banned;
 
         return $this;
     }
