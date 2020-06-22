@@ -33,9 +33,6 @@ class AuthController extends ApiController
     public function register(MailerInterface $mailer,Request $request, UserPasswordEncoderInterface $encoder)
     {
 
-
-
-
         $user = new User;
         $form = $this->createForm(RegistrationFormType::class, $user, ['csrf_protection' => false]);
 
@@ -67,7 +64,7 @@ class AuthController extends ApiController
 
                 $mailer->send($email);
 
-            return $this->respondWithSuccess(sprintf('Votre inscription a été validée, vous aller recevoir un email de confirmation pour activer votre compte et pouvoir vous connecté', $user->getUsername()));
+            return $this->respondWithSuccess(sprintf('Votre inscription a été validée, vous aller recevoir un email de confirmation pour activer votre compte et pouvoir vous connecter', $user->getUsername()));
         } else {
             //dd($form->getErrors(true));
             return $this->json((string) $form->getErrors(true), 400);
@@ -83,6 +80,7 @@ class AuthController extends ApiController
      */
     public function confirmAccount($token, $username): Response
     {
+
 
 
 

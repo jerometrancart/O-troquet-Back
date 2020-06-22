@@ -51,7 +51,7 @@ class User implements UserInterface
      * @Groups({"api_v1_users_read"})
      * 
      * * @Assert\NotBlank(message="New password can not be blank.")
-     *  @Assert\Regex(pattern="/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/i", message="New password is required to be minimum 6 chars in length and to include at least one letter and one number.")
+     *  @Assert\Regex(pattern="/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/i", message="New password is required to be minimum 6 chars in length and to include at least one letter and one number and one special character.")
      */
     private $password;
 
@@ -129,16 +129,22 @@ class User implements UserInterface
      */
     private $confirmationToken;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $is_banned;
+
+
     public function __construct()
     {
         $this->created_at = new \DateTime();
         $this->is_active = false;
+        $this->is_banned = false;
         $this->friends = new ArrayCollection();
         $this->friendsWithMe = new ArrayCollection();
         $this->achievements = new ArrayCollection();
         $this->plays = new ArrayCollection();
     }
-
 
     /**
      * @see UserInterface
@@ -394,6 +400,18 @@ class User implements UserInterface
     public function setConfirmationToken(?string $confirmationToken): self
     {
         $this->confirmationToken = $confirmationToken;
+
+        return $this;
+    }
+
+    public function getIsBanned(): ?bool
+    {
+        return $this->is_banned;
+    }
+
+    public function setIsBanned(bool $is_banned): self
+    {
+        $this->is_banned = $is_banned;
 
         return $this;
     }

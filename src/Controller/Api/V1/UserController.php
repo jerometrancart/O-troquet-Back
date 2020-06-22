@@ -183,9 +183,7 @@ class UserController extends AbstractController
         }
     }
 
-
-
-
+    
     /**
      * @Route("/{id}/update", name="update",  methods={"GET","POST"})
      * 
