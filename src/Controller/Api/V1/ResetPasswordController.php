@@ -6,6 +6,7 @@ use App\Controller\Api\V1\ApiController;
 use App\Entity\User;
 use App\Form\ChangePasswordFormType;
 use App\Form\ResetPasswordRequestFormType;
+use App\Service\MailerService;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -58,7 +59,7 @@ class ResetPasswordController extends ApiController
            //dd($form->get('email')->getData());
             return $this->processSendingPasswordResetEmail(
                 $form->get('email')->getData(),
-                $mailer
+                $mailer,
             );
         } else {
            // dd($form->getErrors());
@@ -147,20 +148,19 @@ class ResetPasswordController extends ApiController
     private function processSendingPasswordResetEmail(string $emailFormData, MailerInterface $mailer)
     {
      
+    
+        $mailerService = new MailerService($mailer);
         $user = $this->getDoctrine()->getRepository(User::class)->findOneBy([
             'email' => $emailFormData,
         ]);
-
-        
         // Marks that you are allowed to see the app_check_email page.
         $this->setCanCheckEmailInSession();
-   
 
         // Do not reveal whether a user account was found or not.
         if (!$user) {
             return $this->redirectToRoute('app_check_email');
         }
-
+        
         try {
            
             $resetToken = $this->resetPasswordHelper->generateResetToken($user);
@@ -170,29 +170,23 @@ class ResetPasswordController extends ApiController
                 'There was a problem handling your password reset request - %s',
                 $e->getReason()
             ));
-
-            
-
-           
+                
         }
        
 
-        $email = (new TemplatedEmail())
-            ->from(new Address('essaiphpmailer@gmail.com', 'Ne pas répondre'))
-            ->to($user->getEmail())
-            ->subject('Your password reset request')
-            ->htmlTemplate('reset_password/email.html.twig')
-            ->context([
-                'resetToken' => $resetToken,
-                'tokenLifetime' => $this->resetPasswordHelper->getTokenLifetime(),
-            ])
-        ;
+        $email = $user->getEmail();
+        $username = $user->getUsername(); 
+        $tokenLifeTime = $this->resetPasswordHelper->getTokenLifetime();
+      
+    
+        $mailer->send($email); */
+        $mailerService->sendToken($resetToken,$email,$username,$tokenLifeTime,'Your password reset request','reset_password/email.html.twig');
     
 
-        $mailer->send($email);
+       
 
-        return $this->respondWithSuccess(sprintf('Un email contenant le lien pour mofifier votre mot de passe vous a été envoyé, il expirera dans %s heure',2));
+        return $this->respondWithSuccess(sprintf('Un email contenant le lien pour mofifier votre mot de passe vous a été envoyé, il expirera dans %s heure',$this->resetPasswordHelper->getTokenLifetime()));
 
-        //return $this->redirectToRoute('app_check_email');
+        
     }
 }

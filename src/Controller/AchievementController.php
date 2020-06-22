@@ -19,8 +19,7 @@ class AchievementController extends AbstractController
      */
     public function list(Request $request) {
 
-
-
+        
         $achievements = $this->getDoctrine()->getRepository(Achievement::class)->findAll();
 
         return $this->render('achievement/list.html.twig', [

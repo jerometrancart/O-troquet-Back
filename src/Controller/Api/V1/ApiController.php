@@ -1,12 +1,5 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: hicham benkachoud
- * Date: 06/01/2020
- * Time: 20:39
- */
-
 namespace App\Controller\Api\V1;
 
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
@@ -16,6 +9,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class ApiController extends AbstractController
 {
+
+    
 
     /**
      * @var integer HTTP status code - 200 (OK) by default
