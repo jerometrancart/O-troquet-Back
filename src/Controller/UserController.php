@@ -3,8 +3,11 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\User;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use App\Form\UserType;
 use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -37,18 +40,39 @@ class UserController extends AbstractController
     /**
      * @Route("/{id}/banned", name="user_banned", methods={"GET","POST"})
      */
-    public function banned($id)
+    public function banned(User $user, MailerInterface $mailer,UserRepository $userRepository)
     {
         // je recupère mon entité
-        $user = $this->getDoctrine()->getRepository(User::class)->find($id);
+        $user = $this->getDoctrine()->getRepository(User::class)->find($user);
         // je demande le manager
         $manager = $this->getDoctrine()->getManager();
 
         $user->setIsActive(false);
+
         // je demande au manager d'executer dans la BDD toute les modifications qui ont été faites sur les entités
         $manager->flush();
+        $email = (new TemplatedEmail())
+        ->from('essaiphpmailer@gmail.com')
+        ->to($user->getEmail())
+        //->cc('cc@example.com')
+        //->bcc('bcc@example.com')
+        //->replyTo('fabien@example.com')
+        //->priority(Email::PRIORITY_HIGH)
+        ->subject('O\'troquet ')
+        ->text('Sending emails is fun again!')
+        ->htmlTemplate('user/banned.html.twig')
+        ->context([
+                'expiration_date' => new \DateTime('+7 days'),
+                'username' => $user,
+            ]);
 
-        return $this->redirectToRoute('user_index');
+            
+        $mailer->send($email);
+
+
+        return $this->render('user/index.html.twig', [
+            'users' => $userRepository->findAll(),
+        ]);
     }
     /**
      * @Route("/{id}/unbanned", name="user_unbanned", methods={"GET","POST"})
