@@ -20,18 +20,18 @@
                 <td>{{ user.username }}</td>
                 <td>{{ user.email }}</td>
                 <td>{{ user.roles ? user.roles|json_encode : '' }}</td>
-                <td>{% if user.isActive %}
-                        {{ 'Autoriser' | trans({}, 'true') }}
+                <td>{% if user.isBanned %}
+                    {{ ' Banni' | trans({}, 'false') }} 
                     {% else %}
-                        {{ ' Banni' | trans({}, 'false') }}
+                    {{ 'Autorisé' | trans({}, 'true') }}
                     {% endif%}
                 </td>
                 <td>
-                    {% if user.isActive == true %}
+                    {% if user.isBanned == false %}
                         <a href="{{ path('user_banned', {'id': user.id}) }}" class="badge badge-danger" onclick="return confirm('Etes vous sur de vouloir bannir l\'utilisateur')">
                             Bannir
                         </a>
-                    {% elseif user.isActive == false  %}
+                    {% elseif user.isBanned == true  %}
                         <a href="{{ path('user_unbanned', {'id': user.id}) }}" class="badge badge-success"onclick="return confirm('Etes vous sur de vouloir réautorisé l\'utilisateur')">
                             Autoriser
                         </a>

@@ -8,25 +8,19 @@ use App\Controller\Api\V1\ApiController;
 use App\Form\RegistrationFormType;
 use App\Service\MailerService;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use SymfonyCasts\Bundle\ResetPassword\Controller\ResetPasswordControllerTrait;
 use SymfonyCasts\Bundle\ResetPassword\ResetPasswordHelperInterface;
 
 
 class AuthController extends ApiController
 {
-
-
 
     use ResetPasswordControllerTrait;
 
@@ -36,7 +30,6 @@ class AuthController extends ApiController
     {
         $this->resetPasswordHelper = $resetPasswordHelper;
     }
-
 
 
     /**
@@ -89,8 +82,8 @@ class AuthController extends ApiController
      */
     public function confirmAccount($token, $username): Response
     {
-        
-        //dd($username, $token);
+
+       
 
         $em = $this->getDoctrine()->getManager();
         $user = $em->getRepository(User::class)->findOneBy(['username' => $username]);
@@ -119,7 +112,6 @@ class AuthController extends ApiController
         //dd("coucou");
         return new JsonResponse(['token' => $JWTManager->create($user)]);
     }
-
 
     /**
      * generate a token

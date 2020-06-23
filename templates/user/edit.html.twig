@@ -6,11 +6,9 @@
 
 {% block body %}
     <h1 class="mt-5">Modifier l'utilisateur</h1>
-
     {{ form_start(form) }}
     {{ form_widget(form) }}
     <button class="btn btn-primary" type="submit">Valider</button>
     <a href="{{ path('user_show', {'id': user.id}) }}" class="btn btn-link">Annuler</a>
     {{ form_end(form) }}
-
 {% endblock %}
