@@ -17,7 +17,7 @@ class MailerService extends AbstractController
       
         $this->mailer = $mailer;
     }
-
+    
     /**
      * Undocumented function
      *
