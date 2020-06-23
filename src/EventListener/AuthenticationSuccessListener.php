@@ -22,12 +22,11 @@ class AuthenticationSuccessListener
             return;
         }
 
-        $data['data'] = array(
+        $data['metadata'] = array(
             'active' => $user->getIsActive(),
             'banned' => $user->getIsBanned(),
         );
 
-        
         if ($user->getIsBanned() === true || $user->getIsActive() === false) {
             unset($data['token']);
         }

@@ -21,7 +21,6 @@
         </tr>
         <tr>
             <th>Roles</th>
-            {{dump(user.roles ? user.roles|json_encode : '' )}}
             {% if ("ROLE_ADMIN" in user.roles ? user.roles|json_encode : ''  ) %}
             <td>Adminstrateur</td>   
             {% else %}
@@ -39,7 +38,7 @@
     </a>
     {% elseif user.isBanned == true  %}
     <a href="{{ path('user_unbanned', {'id': user.id}) }}" class="btn btn-success" onclick="return confirm('Etes vous sur de vouloir réautorisé l\'utilisateur')">
-        Réautorisé
+        Autoriser
     </a>
     {% endif %}
     <a href="{{ path('user_edit', {'id': user.id}) }}" class="btn btn-warning">
