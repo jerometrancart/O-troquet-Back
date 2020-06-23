@@ -17,11 +17,10 @@
         </thead>
         <tbody>
         {% for user in users %}
-        {% if ("ROLE_SUPER_ADMIN" not in user.roles) and ("ROLE_ADMIN" not in user.roles) %}
+        {% if ("ROLE_USER" not in user.roles) %}
             <tr>
                 <td>{{ user.username }}</td>
                 <td>{{ user.email }}</td>
-
                 {% if ("ROLE_ADMIN" in user.roles ? user.roles|json_encode : ''  ) %}
                 <td>Adminstrateur</td>   
                 {% else %}
@@ -48,7 +47,6 @@
                     <a href="{{ path('user_show', {'id': user.id}) }}" class="badge badge-primary" >Détail</a>
                 </td>
                 <td>
-
             </tr>
             {% endif %}
         {% else %}
@@ -58,5 +56,4 @@
         {% endfor %}
         </tbody>
     </table>
-
 {% endblock %}
