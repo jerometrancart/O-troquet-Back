@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\User;
 use App\Entity\UserFriends;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -17,6 +18,69 @@ class UserFriendsRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, UserFriends::class);
+    }
+
+
+
+
+    public function getFriend(User $user)
+    {
+
+         $em = $this->getEntityManager();
+
+
+
+        $query =  $em->createQuery('
+
+        SELECT f
+        FROM App\Entity\UserFriends as f
+        WHERE f.user = :user
+        ')
+            ->setParameter('user', $user->getId());
+
+
+
+
+
+        /*
+
+        
+        SELECT u.id, u.username , f.is_accepted, f.is_contested  ,us.id , us.username
+FROM user_friends as  f
+JOIN user as u ON (f.user_id = u.id)
+JOIN user as us ON (f.friend_id = us.id )
+WHERE user_id = 68
+
+        SELECT u.username
+        FROM App\Entity\UserFriends as f
+        INNER JOIN App\Entity\User as u 
+        ON (f.user.id = u.id)
+        WHERE user = :user
+
+            SELECT u.username
+            FROM App\Entity\UserFriends f
+            INNER JOIN App\Entity\User u ON (f.user.id = u.id)
+            WHERE user = :user
+
+            SELECT u.username
+FROM App\Entity\UserFriends as  f
+INNER JOIN App\Entity\User as u ON (f.user_id = u.id)
+WHERE user_id = user
+
+            // Requete si problematique circular reference
+
+            SELECT u1.username
+            FROM App\Entity\User as u1
+            WHERE u1.id  = :user
+
+            AND u.friend IN (
+                SELECT uf2.id
+                FROM App\Entity\UserFriends uf2
+                WHERE uf2.user = :user
+            )
+        
+        */
+        return $result = $query->getResult();
     }
 
     // /**

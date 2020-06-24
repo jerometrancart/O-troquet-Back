@@ -146,6 +146,11 @@ class User implements UserInterface
         $this->plays = new ArrayCollection();
     }
 
+    public function __toString()
+    {
+        return $this->username;
+    }
+
     /**
      * @see UserInterface
      */

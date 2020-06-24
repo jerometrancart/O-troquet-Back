@@ -92,18 +92,6 @@ class UserFriends
         return $this;
     }
 
-    public function getIsRequested(): ?bool
-    {
-        return $this->is_requested;
-    }
-
-    public function setIsRequested(bool $is_requested): self
-    {
-        $this->is_requested = $is_requested;
-
-        return $this;
-    }
-
     public function getIsContested(): ?bool
     {
         return $this->isContested;

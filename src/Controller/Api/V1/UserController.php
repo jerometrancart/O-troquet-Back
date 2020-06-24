@@ -9,6 +9,7 @@ use App\Entity\UserFriends;
 use App\Form\UserType;
 use App\Repository\UserRepository;
 use App\Repository\PlayRepository;
+use App\Repository\UserFriendsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\Persistence\ObjectManager;
@@ -17,6 +18,10 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
+
 
 /**
  * @Route("/api/v1/users", name="api_v1_user_")
@@ -33,10 +38,9 @@ class UserController extends AbstractController
         $this->normalizer = $objetNormalizer;
         $this->serializer = new Serializer([$objetNormalizer]);
         $this->encoder = $encoder;
-
     }
 
-   
+
     /**
      *
      * add friends 
@@ -51,7 +55,7 @@ class UserController extends AbstractController
         $friend = $this->getDoctrine()->getRepository(User::class)->find($id2);
         $manager = $this->getDoctrine()->getManager();
 
-        
+
         //add first lign for friend relation
         $addNewRelation = new UserFriends;
         $addNewRelation->setUser($user);
@@ -75,10 +79,7 @@ class UserController extends AbstractController
         ], 201);
     }
 
-
-
-
-
+    
     /**
      *
      * @Route("/", name="list")
@@ -94,28 +95,33 @@ class UserController extends AbstractController
         return $this->json($json);
     }
 
+
     /**
      * @Route("/{id}", name="read", methods={"GET"})
      * 
      */
-    public function read(User $user, Request $request)
+    public function read(User $user, Request $request,UserFriendsRepository $userFriendsRepository)
     {
 
+
         return $this->json(
-            $this->serializer->normalize($user, null, ['groups' => ['api_v1_users', 'api_v1_us',]])
-        );
+            $this->serializer->normalize($user, 'null', ['groups' => ['api_v1_users', 'api_v1_users_read', 'friends']])
+         );     
     }
 
     /**
      * @Route("/{id}/friends", name="friends", methods={"GET"})
      */
-    public function friendsList(User $user,Request $request)
+    public function friendsList(User $user ,UserFriendsRepository $userFriendsRepository)
     {
 
+        $getFriend = $userFriendsRepository->getFriend($user);
 
-        return $this->json(
-            $this->serializer->normalize($user, 'json', ['groups' => ['api_v1_users_friends']]));
+        $response = $getFriend[0]->getFriend()->getFriends();
+    
+        $json =  $this->serializer->normalize($response, null, ['groups' => ['friends']]);
 
+        return $this->json($json);
     }
 
 
@@ -184,7 +190,7 @@ class UserController extends AbstractController
         }
     }
 
-    
+
     /**
      * @Route("/{id}/update", name="update",  methods={"GET","POST"})
      * 
