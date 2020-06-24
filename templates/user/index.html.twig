@@ -3,6 +3,7 @@
 {% block title %}Liste des utilisateurs{% endblock %}
 
 {% block body %}
+
     <h1>Liste des utilisateurs</h1>
 
     <table class="table">
@@ -16,33 +17,40 @@
         </thead>
         <tbody>
         {% for user in users %}
-            <tr>
-                <td>{{ user.username }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.roles ? user.roles|json_encode : '' }}</td>
-                <td>{% if user.isActive %}
-                        {{ 'Autoriser' | trans({}, 'true') }}
-                    {% else %}
-                        {{ ' Banni' | trans({}, 'false') }}
-                    {% endif%}
-                </td>
-                <td>
-                    {% if user.isActive == true %}
-                        <a href="{{ path('user_banned', {'id': user.id}) }}" class="badge badge-danger" onclick="return confirm('Etes vous sur de vouloir bannir l\'utilisateur')">
-                            Bannir
-                        </a>
-                    {% elseif user.isActive == false  %}
-                        <a href="{{ path('user_unbanned', {'id': user.id}) }}" class="badge badge-success"onclick="return confirm('Etes vous sur de vouloir réautorisé l\'utilisateur')">
-                            Autoriser
-                        </a>
-                    {% endif %}
-                </td>
-                <td>
-                    <a href="{{ path('user_show', {'id': user.id}) }}" class="badge badge-primary" >Détail</a>
-                </td>
-                <td>
+            {% if ("ROLE_SUPER_ADMIN" not in user.roles) and ("ROLE_ADMIN" not in user.roles) %}
+                <tr>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
 
-            </tr>
+                    {% if ("ROLE_ADMIN" in user.roles ? user.roles|json_encode : ''  ) %}
+                        <td>Adminstrateur</td>
+                    {% else %}
+                        <td>Utilisateur</td>
+                    {% endif %}
+                    <td>{% if user.isBanned %}
+                            {{ ' Banni' | trans({}, 'false') }}
+                        {% else %}
+                            {{ 'Autorisé' | trans({}, 'true') }}
+                        {% endif%}
+                    </td>
+                    <td>
+                        {% if user.isBanned == false %}
+                            <a href="{{ path('user_banned', {'id': user.id}) }}" class="badge badge-danger" onclick="return confirm('Etes vous sur de vouloir bannir l\'utilisateur')">
+                                Bannir
+                            </a>
+                        {% elseif user.isBanned == true  %}
+                            <a href="{{ path('user_unbanned', {'id': user.id}) }}" class="badge badge-success"onclick="return confirm('Etes vous sur de vouloir réautorisé l\'utilisateur')">
+                                Autoriser
+                            </a>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ path('user_show', {'id': user.id}) }}" class="badge badge-primary" >Détail</a>
+                    </td>
+                    <td>
+
+                </tr>
+            {% endif %}
         {% else %}
             <tr>
                 <td colspan="5">no records found</td>

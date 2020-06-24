@@ -10,77 +10,86 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
           integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.1.7/css/fork-awesome.min.css" integrity="sha256-gsmEoJAws/Kd3CjuOQzLie5Q3yshhvmo7YNtBG7aaEY=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.1.7/css/fork-awesome.min.css"
+          integrity="sha256-gsmEoJAws/Kd3CjuOQzLie5Q3yshhvmo7YNtBG7aaEY=" crossorigin="anonymous">
     {% block stylesheets %}{% endblock %}
 
     <title>{% block title %}O'troquet{% endblock %}</title>
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg  navbar-light bg-light">
+<nav class="navbar navbar-expand-lg  navbar-light bg-light">
     <a class="navbar-brand" href="{{ path('homepage') }}">
-        <img src="{{ asset('images/jeu-des.png') }}" width="30" height="30" class="d-inline-block align-top">
+        <img src="{{ asset('uploads/images/jeu-des.png') }}" width="30" height="30" class="d-inline-block align-top">
         O'Troquet
     </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
-                aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-            <div class="navbar-nav mr-auto">
-                <a class="nav-item nav-link" href="{{ path('game_list') }}">Game</a>
-                <a class="nav-item nav-link" href="{{ path('achievement_list') }}">Achievement</a>
-                <a class="nav-item nav-link" href="{{ path('user_index') }}">User</a>
-
-                <div class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fa fa-user" aria-hidden="true"></i>
-                        {% if app.user %}
-                            {{ app.user.email }}
-                        {% endif %}
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        {% if app.user %}
-                            <span class="dropdown-item">
-                                {% if "ROLE_ADMIN" in app.user.roles %}
-                                    Administrateur
-                                {% else %}
-                                    Utilisateur
-                                {% endif %}
-                            </span>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="{{ path('app_logout') }}">Déconnexion</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+            aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav mr-auto">
+            <a class="nav-item nav-link" href="{{ path('game_list') }}">Game</a>
+            <a class="nav-item nav-link" href="{{ path('achievement_list') }}">Achievement</a>
+            <a class="nav-item nav-link" href="{{ path('user_index') }}">User</a>
 
 
-                        {% else %}
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="{{ path('app_login') }}">Connexion</a>
-                        {% endif %}
-                    </div>
+            {% if (app.user != null) %}
+                {% if ("ROLE_SUPER_ADMIN" in app.user.roles ? app.user.roles|json_encode : ''  ) %}
+                    <a class="nav-item nav-link" href="">SuperAdmin</a>
+                {% endif %}
+            {% endif %}
+
+
+            <div class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fa fa-user" aria-hidden="true"></i>
+                    {% if app.user %}
+                        {{ app.user.email }}
+                    {% endif %}
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    {% if app.user %}
+                        <span class="dropdown-item">
+                            {% if "ROLE_ADMIN" in app.user.roles %}
+                                Administrateur
+                            {% else %}
+                                Utilisateur
+                            {% endif %}
+                        </span>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{{ path('user_profil', {'id': app.user.id}) }}">Mon compte</a>
+                        <a class="dropdown-item" href="{{ path('app_logout') }}">Déconnexion</a>
+                    {% else %}
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{{ path('app_login') }}">Connexion</a>
+                    {% endif %}
                 </div>
             </div>
-
         </div>
-    </nav>
-    <div class="container">
+
+    </div>
+</nav>
+<div class="container">
 
 
     {% block body %}{% endblock %}
 
 
-<!-- Optional JavaScript -->
-<!-- jQuery first, then Popper.js, then Bootstrap JS -->
-<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
-        crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-        crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
-        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
-        crossorigin="anonymous"></script>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+            integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+            integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous">
+    </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+            integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous">
+    </script>
 
-{% block javascripts %}{% endblock %}
+    {% block javascripts %}{% endblock %}
 </body>
 
 </html>

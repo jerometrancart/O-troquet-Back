@@ -4,6 +4,7 @@ namespace App\Form;
 
 use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -14,6 +15,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
@@ -22,18 +24,36 @@ class UserType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+
             ->add('username')
             ->add('email', EmailType::class)
-            ->add('roles', ChoiceType::class, [
-                'choices' => [
-                    'Utilisateur' => 'ROLE_USER',
-                    'Administrateur' => 'ROLE_ADMIN',
-                    'SuperAdmin' => "ROLE_SUPER_ADMIN",
+
+            ->add('roles', ChoiceType::class
+                , [
+                    'choices' => [
+                        'Utilisateur' => 'ROLE_USER',
+                        'Administrateur' => 'ROLE_ADMIN',
+                        'SuperAdmin' => "ROLE_SUPER_ADMIN",
+
+                    ],
+                    'multiple' => true,
+                    'expanded' => true,
+                ])
+            ->add('avatar', FileType::class, [
+                'label' => 'Avatar',
+                'mapped' => false,
+                'required' => false,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '536k',
+                        'mimeTypes' => [
+                            'image/jpeg',
+                            'image/x-jpg',
+                        ],
+                        'mimeTypesMessage' => 'Please upload a valid PDF document',
+                    ])
                 ],
-                'multiple' => true,
-                'expanded' => true,
             ])
-            ->add('avatar')
             ->add('email', EmailType::class, [
                 'constraints' => [
                     new Email,

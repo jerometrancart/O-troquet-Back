@@ -8,8 +8,8 @@
     <table class="table">
         <tbody>
         <tr>
-            <th>Id</th>
-            <td>{{ user.id }}</td>
+            <th>Avatar</th>
+            <img class="d-flex flex-row-reverse" src="{{asset('uploads/images/' ~ user.avatar ) }}">
         </tr>
         <tr>
             <th>Username</th>
@@ -22,7 +22,7 @@
 
         <tr>
             <th>Roles</th>
-            {{(user.roles ? user.roles|json_encode : '' )}}
+
             {% if ("ROLE_ADMIN" in user.roles ? user.roles|json_encode : ''  ) %}
                 <td>Adminstrateur</td>
             {% else %}
@@ -33,16 +33,6 @@
     </table>
 
 
-    <a class="btn btn-primary" href="{{ path('user_index') }}">Back to list</a>
-    {% if user.isBanned == false %}
-        <a href="{{ path('user_banned', {'id': user.id}) }}" class="btn btn-danger" onclick="return confirm('Etes vous sur de vouloir bannir l'utilisateur')">
-            Bannir
-        </a>
-    {% elseif user.isBanned == true  %}
-        <a href="{{ path('user_unbanned', {'id': user.id}) }}" class="btn btn-success" onclick="return confirm('Etes vous sur de vouloir réautorisé l'utilisateur')">
-            Réautorisé
-        </a>
-    {% endif %}
     <a href="{{ path('user_edit', {'id': user.id}) }}" class="btn btn-warning">
         Modifier
     </a>

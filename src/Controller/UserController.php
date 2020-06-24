@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Annotation\Route;
@@ -28,6 +30,20 @@ class UserController extends AbstractController
             'users' => $userRepository->findAll(),
         ]);
     }
+
+    /**
+     * @Route("/{id}/profil", name="user_profil", methods={"GET", "POST"})
+     */
+    public function profil(User $user): Response
+    {
+
+        return $this->render('user/profil.html.twig', [
+            'user' => $user,
+        ]);
+    }
+
+
+
     /**
      * @Route("/{id}", name="user_show", methods={"GET"})
      */
@@ -37,6 +53,7 @@ class UserController extends AbstractController
             'user' => $user,
         ]);
     }
+
     /**
      * @Route("/{id}/banned", name="user_banned", methods={"GET","POST"})
      */
@@ -102,6 +119,7 @@ class UserController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             // On vérifie si le champs password contient une valeur
             // On récupère la valeur de ce champs
+
             $password = $form->get('password')->getData();
 
             // Si rien n'a été tapé dans le champs password, on reçoit las valeur null
@@ -111,6 +129,18 @@ class UserController extends AbstractController
                 $user->setPassword($encodedPassword);
             }
 
+            /** @var UploadedFile avatar  */
+            $avatar  = $form->get('avatar')->getData();
+            if($avatar ) {
+                $avatarfilename = uniqid() . '.' . $avatar ->guessExtension();
+
+                $avatar ->move(
+                    $this->getParameter('images_directory'),
+                    $avatarfilename
+                );
+
+                $user->setAvatar($avatar);
+            }
             $this->getDoctrine()->getManager()->flush();
 
             return $this->redirectToRoute('user_index');
