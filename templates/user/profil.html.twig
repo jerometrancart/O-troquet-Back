@@ -8,8 +8,7 @@
     <table class="table">
         <tbody>
         <tr>
-            <th>Avatar</th>
-            <img class="d-flex flex-row-reverse" src="{{asset('uploads/images/' ~ user.avatar ) }}">
+            <td><img src="{{ asset('uploads/images/'~ user.avatar) }}" width="70" height="70" class="d-inline-block align-top"></td>
         </tr>
         <tr>
             <th>Username</th>

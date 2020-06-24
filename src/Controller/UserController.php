@@ -36,7 +36,6 @@ class UserController extends AbstractController
      */
     public function profil(User $user): Response
     {
-
         return $this->render('user/profil.html.twig', [
             'user' => $user,
         ]);
@@ -132,14 +131,14 @@ class UserController extends AbstractController
             /** @var UploadedFile avatar  */
             $avatar  = $form->get('avatar')->getData();
             if($avatar ) {
-                $avatarfilename = uniqid() . '.' . $avatar ->guessExtension();
+                $filename = uniqid() . '.' . $avatar ->guessExtension();
 
                 $avatar ->move(
                     $this->getParameter('images_directory'),
-                    $avatarfilename
+                    $filename
                 );
 
-                $user->setAvatar($avatar);
+                $user->setAvatar($filename);
             }
             $this->getDoctrine()->getManager()->flush();
 
