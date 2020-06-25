@@ -74,7 +74,6 @@ security:
         - { path: ^/confirm_account, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/(login|register), roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/user, roles: ROLE_ADMIN }
         - { path: '(update|view|banned|unbanned|edit)', roles: ROLE_ADMIN }
         - { path: ^/\w+, roles: ROLE_USER }

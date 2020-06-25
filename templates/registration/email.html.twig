@@ -1,7 +1,7 @@
 <h1>Hi!</h1>
 
 <p>
-    To reset your password, please visit
+   To confirm your account
     <a href="{{ url('confirm_account', {token: Token.confirmationToken , username: username})}}">here</a>
     This link will expire in {{ tokenLifetime|date('g') }} hour(s)..
 </p>

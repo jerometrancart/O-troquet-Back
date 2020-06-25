@@ -10,6 +10,7 @@ use App\Entity\User;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use App\Form\UserType;
 use App\Repository\UserRepository;
+use App\Service\MailerService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -42,6 +43,8 @@ class UserController extends AbstractController
      */
     public function banned(User $user, MailerInterface $mailer,UserRepository $userRepository)
     {
+
+        $mailerService = new MailerService($mailer);
         // je recupère mon entité
         $user = $this->getDoctrine()->getRepository(User::class)->find($user);
         // je demande le manager
@@ -51,25 +54,10 @@ class UserController extends AbstractController
 
         // je demande au manager d'executer dans la BDD toute les modifications qui ont été faites sur les entités
         $manager->flush();
-        $email = (new TemplatedEmail())
-        ->from('essaiphpmailer@gmail.com')
-        ->to($user->getEmail())
-        //->cc('cc@example.com')
-        //->bcc('bcc@example.com')
-        //->replyTo('fabien@example.com')
-        //->priority(Email::PRIORITY_HIGH)
-        ->subject('O\'troquet ')
-        ->text('Sending emails is fun again!')
-        ->htmlTemplate('user/banned.html.twig')
-        ->context([
-                'expiration_date' => new \DateTime('+7 days'),
-                'username' => $user,
-            ]);
-
-            
-        $mailer->send($email);
-
-
+        $to = $user->getEmail();
+      
+        $mailerService->sendToken($token = [], $to, $user,$tokenLifeTime = [],'Compte banni','user/banned.html.twig');
+    
         return $this->render('user/index.html.twig', [
             'users' => $userRepository->findAll(),
         ]);
@@ -90,6 +78,8 @@ class UserController extends AbstractController
 
         return $this->redirectToRoute('user_index');
     }
+
+    
 
     /**
      * @Route("/{id}/edit", name="user_edit", methods={"GET","POST"})
