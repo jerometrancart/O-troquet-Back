@@ -79,6 +79,8 @@ class UserController extends AbstractController
         return $this->redirectToRoute('user_index');
     }
 
+    
+
     /**
      * @Route("/{id}/edit", name="user_edit", methods={"GET","POST"})
      */

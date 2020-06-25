@@ -53,11 +53,11 @@ class UserController extends ApiController
     {
         //dd($this->getUser());
 
-        if($this->getUser()->getId()!== $user->getId()){
+        if ($this->getUser()->getId() !== $user->getId()) {
             return $this->respondUnauthorized("t'as rien à faire là mon pote");
-        } 
-       
-       
+        }
+
+
         $friend = $this->getDoctrine()->getRepository(User::class)->find($idFriend);
         $manager = $this->getDoctrine()->getManager();
 
@@ -68,18 +68,6 @@ class UserController extends ApiController
         $addNewRelation->setIsAccepted(false);
         $addNewRelation->setIsAnswered(false);
         $manager->persist($addNewRelation);
-
-/* 
-        //add second lign for same friend relation
-      
-        $addNewRelation2 = new UserFriends;
-        $addNewRelation2->setUser($friend);
-        $addNewRelation2->setFriend($user);
-        $addNewRelation2->setIsContested(false);
-        $addNewRelation2->setIsAccepted(false);
-        
-        $manager->persist($addNewRelation2);
-*/
 
         $manager->flush();
         return $this->json([
@@ -97,47 +85,41 @@ class UserController extends ApiController
     {
 
 
-        if($this->getUser()->getId()!== $user->getId()){
+        if ($this->getUser()->getId() !== $user->getId()) {
             return $this->respondUnauthorized("t'as rien à faire là mon pote");
         }
-
-        
-
-    //dd($bool);
+       
 
         $friend = $this->getDoctrine()->getRepository(User::class)->find($idFriend);
-        $friendship = $this->getDoctrine()->getRepository(UserFriends::class)->getFriendship($user,$friend);
-    
+        $friendship = $this->getDoctrine()->getRepository(UserFriends::class)->getFriendship($user, $friend);
+
+        //add second lign for same friend relation
+        // and modify the first one
+
 
         $addNewRelation = new UserFriends;
         $addNewRelation->setUser($user);
         $addNewRelation->setFriend($friend);
         $addNewRelation->setIsAnswered(true);
         $friendship->setIsAnswered(true);
-        if($bool ==1){
-        $friendship->setIsAccepted(true);
-        $addNewRelation->setIsAccepted(true);
+        if ($bool == 1) {
+            $friendship->setIsAccepted(true);
+            $addNewRelation->setIsAccepted(true);
+        } else {
+            $friendship->setIsAccepted(false);
+            $addNewRelation->setIsAccepted(false);
         }
-        else {
-         $friendship->setIsAccepted(false);
-         $addNewRelation->setIsAccepted(false);
-        }
-        
-      
+
         //Get Manager
         $manager = $this->getDoctrine()->getManager();
 
-    
-
-        //add second lign for same friend relation
-      
-        $manager->persist($addNewRelation,$friendship);
+        $manager->persist($addNewRelation, $friendship);
         $manager->flush();
         return $this->json([
-            'message' => 'répondu'], 201);
+            'message' => 'répondu'
+        ], 201);
     }
 
-    
     /**
      *
      * @Route("/", name="list")
@@ -153,7 +135,6 @@ class UserController extends ApiController
         return $this->json($json);
     }
 
-
     /**
      * @Route("/{id}", name="read", methods={"GET"})
      * 
@@ -165,11 +146,8 @@ class UserController extends ApiController
 
         return $this->json(
             $this->serializer->normalize($user, 'null', ['groups' => ['api_v1_users', 'api_v1_users_read']])
-         );     
+        );
     }
-
-
-
 
     /**
      * @Route("", name="add", methods={"POST"})
@@ -308,7 +286,7 @@ class UserController extends ApiController
         $user->setIsActive(false);
         $manager->flush();
         return $this->json([
-            'message' => 'Vôtre compte à été banni',
+            'message' => 'Votre compte à été banni',
             'path' => 'src/Controller/Api/V1/UserController.php',
         ]);
     }
