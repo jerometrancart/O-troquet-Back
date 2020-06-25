@@ -6,26 +6,30 @@ namespace App\EventListener;
 use Lexik\Bundle\JWTAuthenticationBundle\Event\AuthenticationSuccessEvent;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class AuthenticationSuccessListener{
-
-/**
- * @param AuthenticationSuccessEvent $event
- */
-public function onAuthenticationSuccessResponse(AuthenticationSuccessEvent $event)
+class AuthenticationSuccessListener
 {
-    $data = $event->getData();
-    $user = $event->getUser();
 
-    if (!$user instanceof UserInterface) {
-        return;
+    /**
+     * intercept /login_check
+     * @param AuthenticationSuccessEvent $event
+     */
+    public function onAuthenticationSuccessResponse(AuthenticationSuccessEvent $event)
+    {
+        $data = $event->getData();
+        $user = $event->getUser();
+
+        if (!$user instanceof UserInterface) {
+            return;
+        }
+
+        $data['metadata'] = array(
+            'active' => $user->getIsActive(),
+            'banned' => $user->getIsBanned(),
+        );
+
+        if ($user->getIsBanned() === true || $user->getIsActive() === false) {
+            unset($data['token']);
+        }
+        $event->setData($data);
     }
-
-    $data['data'] = array(
-        'active' => $user->getIsActive(),
-        'banned' => $user->getIsBanned()
-    );
-    
-    $event->setData($data);
-}
-
 }

@@ -6,7 +6,10 @@
 
 {% block body %}
     <h1 class="mt-5">Modifier l'utilisateur</h1>
+<<<<<<< HEAD
     {% if "ROLE_SUPER_ADMIN" in app.user.roles %}
+=======
+>>>>>>> 532e5d4971433ae794e474f39cfa0bb1ba410968
     {{ form_start(form) }}
     {{ form_row(form.username) }}
     {{ form_row(form.email) }}
@@ -25,5 +28,4 @@
     <button class="btn btn-primary" type="submit">Valider</button>
     <a href="{{ path('user_show', {'id': user.id}) }}" class="btn btn-link">Annuler</a>
     {{ form_end(form) }}
-
 {% endblock %}

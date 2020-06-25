@@ -6,19 +6,12 @@
 
 {% block body %}
     <h1 class="mt-5">Modifier vôtre compte</h1>
-    {% if "ROLE_SUPER_ADMIN" in app.user.roles %}
-        {{ form_start(form) }}
-        {{ form_row(form.username) }}
-        {{ form_row(form.email) }}
-        {{ form_row(form.password) }}
 
-    {% else %}
-        {{ form_start(form) }}
-        {{ form_row(form.username) }}
-        {{ form_row(form.email) }}
-        {{ form_row(form.password) }}
-    {% endif %}
-
+    {{ form_start(form) }}
+    {{ form_row(form.username) }}
+    {{ form_row(form.email) }}
+    {{ form_row(form.password) }}
+    {{ form_row(form.roles) }}
 
     <button class="btn btn-primary" type="submit">Valider</button>
     {{ form_end(form) }}

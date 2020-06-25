@@ -8,25 +8,19 @@ use App\Controller\Api\V1\ApiController;
 use App\Form\RegistrationFormType;
 use App\Service\MailerService;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use SymfonyCasts\Bundle\ResetPassword\Controller\ResetPasswordControllerTrait;
 use SymfonyCasts\Bundle\ResetPassword\ResetPasswordHelperInterface;
 
 
 class AuthController extends ApiController
 {
-
-
 
     use ResetPasswordControllerTrait;
 
@@ -37,12 +31,13 @@ class AuthController extends ApiController
         $this->resetPasswordHelper = $resetPasswordHelper;
     }
 
+
     /**
      * 
      * @Route("/api/register", name="api_register", methods={"POST"})
      * 
      */
-    public function register(MailerInterface $mailer, Request $request, UserPasswordEncoderInterface $encoder,MailerService $mailerService)
+    public function register(MailerInterface $mailer, Request $request, UserPasswordEncoderInterface $encoder, MailerService $mailerService)
     {
 
         $user = new User;
@@ -88,10 +83,7 @@ class AuthController extends ApiController
     public function confirmAccount($token, $username): Response
     {
 
-
-
-
-        //dd($username, $token);
+       
 
         $em = $this->getDoctrine()->getManager();
         $user = $em->getRepository(User::class)->findOneBy(['username' => $username]);
@@ -120,7 +112,6 @@ class AuthController extends ApiController
         //dd("coucou");
         return new JsonResponse(['token' => $JWTManager->create($user)]);
     }
-
 
     /**
      * generate a token
