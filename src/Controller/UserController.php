@@ -63,7 +63,7 @@ class UserController extends AbstractController
         // je demande le manager
         $manager = $this->getDoctrine()->getManager();
 
-        $user->setIsActive(false);
+        $user->setIsBanned(true);
 
         // je demande au manager d'executer dans la BDD toute les modifications qui ont été faites sur les entités
         $manager->flush();
@@ -100,7 +100,7 @@ class UserController extends AbstractController
         // je demande le manager
         $manager = $this->getDoctrine()->getManager();
 
-        $user->setIsActive(true);
+        $user->setIsBanned(false);
         // je demande au manager d'executer dans la BDD toute les modifications qui ont été faites sur les entités
         $manager->flush();
 
@@ -112,6 +112,7 @@ class UserController extends AbstractController
      */
     public function edit(UserPasswordEncoderInterface $passwordEncoder, Request $request, User $user): Response
     {
+        if($user === $user){
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 
@@ -128,12 +129,12 @@ class UserController extends AbstractController
                 $user->setPassword($encodedPassword);
             }
 
-            /** @var UploadedFile avatar  */
-            $avatar  = $form->get('avatar')->getData();
-            if($avatar ) {
-                $filename = uniqid() . '.' . $avatar ->guessExtension();
+            /** @var UploadedFile avatar */
+            $avatar = $form->get('avatar')->getData();
+            if ($avatar) {
+                $filename = uniqid() . '.' . $avatar->guessExtension();
 
-                $avatar ->move(
+                $avatar->move(
                     $this->getParameter('images_directory'),
                     $filename
                 );
@@ -143,6 +144,7 @@ class UserController extends AbstractController
             $this->getDoctrine()->getManager()->flush();
 
             return $this->redirectToRoute('user_index');
+        }else('vous ne pouvez pas modifié ce profil');
         }
 
         return $this->render('user/edit.html.twig', [
