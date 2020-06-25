@@ -19,6 +19,7 @@ class Play
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      * @Groups({"api_v1_users_stat"})
+     * @Groups({"api_v1_play"})
      */
     private $id;
 
@@ -28,7 +29,7 @@ class Play
      * @Groups({"api_v1_users_stat"})
      */
     private $win;
-
+ 
     /**
      * @ORM\Column(type="datetime")
      *
@@ -39,14 +40,22 @@ class Play
      * @ORM\ManyToOne(targetEntity=Game::class, inversedBy="plays")
      * @ORM\JoinColumn(nullable=false)
      * @Groups({"api_v1_users_stat"})
+     *  @Groups({"api_v1_play"})
      */
     private $game;
 
     /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="plays")
      * @ORM\JoinColumn(nullable=false)
+     * @Groups({"api_v1_play"})
      */
     private $user;
+
+    public function __construct()
+    {
+        $this->date = new \DateTime();
+    }
+
 
     public function getId(): ?int
     {

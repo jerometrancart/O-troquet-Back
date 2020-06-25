@@ -40,17 +40,14 @@ class UserController extends AbstractController
     /**
      *
      * add friends 
-     * @Route("/{id}/requests/{id2}/friends", requirements={"id" = "\d+","id2" = "\d+"}, name="li")
+     * @Route("/{id}/requests/{id2}/friends", requirements={"id" = "\d+","id2" = "\d+"}, name="add_friends")
      * 
-     * 
-     *
      */
     public function friendRequest(User $user, $id2)
     {
 
         $friend = $this->getDoctrine()->getRepository(User::class)->find($id2);
         $manager = $this->getDoctrine()->getManager();
-
         
         //add first lign for friend relation
         $addNewRelation = new UserFriends;
@@ -58,7 +55,6 @@ class UserController extends AbstractController
         $addNewRelation->setFriend($friend);
         $addNewRelation->setIsContested(true);
         $addNewRelation->setIsAccepted(false);
-
         //add second lign for same friend relation
         $manager->persist($addNewRelation);
         $addNewRelation2 = new UserFriends;
@@ -71,13 +67,9 @@ class UserController extends AbstractController
         $manager->persist($addNewRelation2);
         $manager->flush();
         return $this->json([
-            'message' => '',
+            'message' => 'coucou',
         ], 201);
     }
-
-
-
-
 
     /**
      *
@@ -117,6 +109,7 @@ class UserController extends AbstractController
             $this->serializer->normalize($user, 'json', ['groups' => ['api_v1_users_friends']]));
 
     }
+
 
 
 
