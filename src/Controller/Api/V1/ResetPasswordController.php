@@ -107,6 +107,7 @@ class ResetPasswordController extends ApiController
             ));
 
             return $this->redirectToRoute('app_forgot_password_request');
+
         }
 
         // The token is valid; allow the user to change their password.
@@ -174,7 +175,7 @@ class ResetPasswordController extends ApiController
         $tokenLifeTimeInHour = ($tokenLifeTime / 3600);
       
 
-        $mailerService->sendToken($resetToken,$email,$username,$tokenLifeTime,'Your password reset request','reset_password/email.html.twig');
+        $mailerService->sendToken($resetToken,$email,$username,$tokenLifeTime,'résiliation de votre mot de passe','reset_password/email.html.twig');
     
 
         return $this->respondWithSuccess(sprintf('Un email contenant le lien pour mofifier votre mot de passe vous a été envoyé, il expirera dans %s heure',$tokenLifeTimeInHour));

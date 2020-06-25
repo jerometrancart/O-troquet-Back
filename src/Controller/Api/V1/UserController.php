@@ -26,7 +26,7 @@ use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 /**
  * @Route("/api/v1/users", name="api_v1_user_")
  */
-class UserController extends AbstractController
+class UserController extends ApiController
 {
 
 
@@ -44,40 +44,97 @@ class UserController extends AbstractController
     /**
      *
      * add friends 
-     * @Route("/{id}/requests/{id2}/friends", requirements={"id" = "\d+","id2" = "\d+"}, name="li")
+     * @Route("/{id}/requests/{idFriend}/friends", requirements={"id" = "\d+","id2" = "\d+"}, name="friendRequest")
      * 
      * 
      *
      */
     public function friendRequest(User $user, $idFriend)
     {
+        //dd($this->getUser());
 
+        if($this->getUser()->getId()!== $user->getId()){
+            return $this->respondUnauthorized("t'as rien à faire là mon pote");
+        } 
+       
+       
         $friend = $this->getDoctrine()->getRepository(User::class)->find($idFriend);
         $manager = $this->getDoctrine()->getManager();
 
-
-
         //add first lign for friend relation
         $addNewRelation = new UserFriends;
-        $addNewRelation->setUser($user);
-        $addNewRelation->setFriend($friend);
-        $addNewRelation->setIsContested(true);
+        $addNewRelation->setUser($friend);
+        $addNewRelation->setFriend($user);
         $addNewRelation->setIsAccepted(false);
+        $addNewRelation->setIsAnswered(false);
+        $manager->persist($addNewRelation);
+
 /* 
         //add second lign for same friend relation
-        $manager->persist($addNewRelation);
+      
         $addNewRelation2 = new UserFriends;
         $addNewRelation2->setUser($friend);
         $addNewRelation2->setFriend($user);
         $addNewRelation2->setIsContested(false);
         $addNewRelation2->setIsAccepted(false);
- */
-
+        
         $manager->persist($addNewRelation2);
+*/
+
         $manager->flush();
         return $this->json([
-            'message' => '',
+            'message' => 'demande d\'ami envoyée',
         ], 201);
+    }
+
+    /**
+     *
+     * add friends 
+     * @Route("/{id}/response/{idFriend}/friends/{bool}", requirements={"id" = "\d+","id2" = "\d+","bool" = "[01]"}, name="friendResponse")
+     * 
+     */
+    public function friendResponse(User $user, $idFriend, $bool)
+    {
+
+
+        if($this->getUser()->getId()!== $user->getId()){
+            return $this->respondUnauthorized("t'as rien à faire là mon pote");
+        }
+
+        
+
+    //dd($bool);
+
+        $friend = $this->getDoctrine()->getRepository(User::class)->find($idFriend);
+        $friendship = $this->getDoctrine()->getRepository(UserFriends::class)->getFriendship($user,$friend);
+    
+
+        $addNewRelation = new UserFriends;
+        $addNewRelation->setUser($user);
+        $addNewRelation->setFriend($friend);
+        $addNewRelation->setIsAnswered(true);
+        $friendship->setIsAnswered(true);
+        if($bool ==1){
+        $friendship->setIsAccepted(true);
+        $addNewRelation->setIsAccepted(true);
+        }
+        else {
+         $friendship->setIsAccepted(false);
+         $addNewRelation->setIsAccepted(false);
+        }
+        
+      
+        //Get Manager
+        $manager = $this->getDoctrine()->getManager();
+
+    
+
+        //add second lign for same friend relation
+      
+        $manager->persist($addNewRelation,$friendship);
+        $manager->flush();
+        return $this->json([
+            'message' => 'répondu'], 201);
     }
 
     
@@ -111,28 +168,6 @@ class UserController extends AbstractController
          );     
     }
 
-    /**
-     * @Route("/{id}/friends", name="friends", methods={"GET"})
-     */
-    public function friendsList(User $user ,UserFriendsRepository $userFriendsRepository)
-    {
-
-
-        // dd($getFriend);
-
-       // $response = $getFriend[0]->getFriend()->getFriends();
-
-        // dump($response);
-        // foreach ($response as $friend) {
-        //     $d = $friend;
-        // }
-
-        // dd($response);
-    
-        $json =  $this->serializer->normalize($friends, null, ['groups' => ['api_v1_users']]);
-
-        return $this->json($json);
-    }
 
 
 

@@ -45,7 +45,7 @@ class UserFriends
      * @ORM\Column(type="boolean")
      * @Groups({"api_v1_users"})
      */
-    private $isContested;
+    private $isAnswered;
 
 
     public function getId(): ?int
@@ -89,17 +89,7 @@ class UserFriends
         return $this;
     }
 
-    public function getIsContested(): ?bool
-    {
-        return $this->isContested;
-    }
-
-    public function setIsContested(bool $isContested): self
-    {
-        $this->isContested = $isContested;
-
-        return $this;
-    }
+    
 
     /**
      * @Groups({"api_v1_users"})
@@ -110,5 +100,17 @@ class UserFriends
             'id' => $this->friend->getId(),
             'username' => $this->friend->getUsername(),
         ];
+    }
+
+    public function getIsAnswered(): ?bool
+    {
+        return $this->isAnswered;
+    }
+
+    public function setIsAnswered(bool $isAnswered): self
+    {
+        $this->isAnswered = $isAnswered;
+
+        return $this;
     }
 }
