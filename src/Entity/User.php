@@ -48,8 +48,6 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=255)
      * 
-     * @Groups({"api_v1_users_read"})
-     * 
      * * @Assert\NotBlank(message="New password can not be blank.")
      *  @Assert\Regex(pattern="/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/i", message="New password is required to be minimum 6 chars in length and to include at least one letter and one number and one special character.")
      */

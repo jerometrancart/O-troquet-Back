@@ -32,18 +32,18 @@ class UserFriends
     /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="friendsWithMe")
      * @MaxDepth(4)
-     *
      */
     private $friend;
-
    
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"api_v1_users"})
      */
-    private $is_accepted;
+    private $isAccepted;
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"api_v1_users"})
      */
     private $isContested;
 
@@ -55,19 +55,16 @@ class UserFriends
 
     public function getIsAccepted(): ?bool
     {
-        return $this->is_accepted;
+        return $this->isAccepted;
     }
 
-    public function setIsAccepted(bool $is_accepted): self
+    public function setIsAccepted(bool $isAccepted): self
     {
-        $this->is_accepted = $is_accepted;
+        $this->isAccepted = $isAccepted;
 
         return $this;
     }
 
-    /*
-     * @Groups({"api_v1_users_friends"})
-     */
     public function getUser(): ?User
     {
         return $this->user;
@@ -102,5 +99,16 @@ class UserFriends
         $this->isContested = $isContested;
 
         return $this;
+    }
+
+    /**
+     * @Groups({"api_v1_users"})
+     */
+    public function getFriendDetails()
+    {
+        return [
+            'id' => $this->friend->getId(),
+            'username' => $this->friend->getUsername(),
+        ];
     }
 }

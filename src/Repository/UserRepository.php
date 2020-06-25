@@ -69,4 +69,24 @@ class UserRepository extends ServiceEntityRepository
         return $result;
     }
 
+    public function getFullUser(int $id)
+    {
+        $em = $this->getEntityManager();
+
+
+    
+
+        $query =  $em->createQuery('
+        SELECT u, uf, f
+        FROM App\Entity\User as u
+        LEFT JOIN u.friends as uf
+        LEFT JOIN uf.friend as f
+        WHERE u.id = :user
+        ')
+            ->setParameter('user', $id);
+
+        return $result = $query->getResult();
+    }
+
+
 }

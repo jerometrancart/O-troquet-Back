@@ -26,24 +26,32 @@ class UserFriendsRepository extends ServiceEntityRepository
     public function getFriend(User $user)
     {
 
-         $em = $this->getEntityManager();
-
-
+        $em = $this->getEntityManager();
 
         $query =  $em->createQuery('
-
-        SELECT f
-        FROM App\Entity\UserFriends as f
-        WHERE f.user = :user
+        SELECT f, u, us
+        FROM App\Entity\UserFriends as  f
+        JOIN f.user as u
+        JOIN f.friend as us
+        WHERE u.id = :user
         ')
             ->setParameter('user', $user->getId());
 
 
 
-
-
+        /* 
+            SELECT u.id, u.username , f.is_accepted, f.is_contested  ,us.id , us.username
+            FROM user_friends as  f
+            JOIN user as u ON (f.user_id = u.id)
+            JOIN user as us ON (f.friend_id = us.id )
+            WHERE user_id = 68
+ */
         /*
 
+
+         SELECT f
+        FROM App\Entity\UserFriends as f
+        WHERE f.user = :user
         
         SELECT u.id, u.username , f.is_accepted, f.is_contested  ,us.id , us.username
 FROM user_friends as  f

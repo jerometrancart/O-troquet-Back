@@ -49,11 +49,12 @@ class UserController extends AbstractController
      * 
      *
      */
-    public function friendRequest(User $user, $id2)
+    public function friendRequest(User $user, $idFriend)
     {
 
-        $friend = $this->getDoctrine()->getRepository(User::class)->find($id2);
+        $friend = $this->getDoctrine()->getRepository(User::class)->find($idFriend);
         $manager = $this->getDoctrine()->getManager();
+
 
 
         //add first lign for friend relation
@@ -62,7 +63,7 @@ class UserController extends AbstractController
         $addNewRelation->setFriend($friend);
         $addNewRelation->setIsContested(true);
         $addNewRelation->setIsAccepted(false);
-
+/* 
         //add second lign for same friend relation
         $manager->persist($addNewRelation);
         $addNewRelation2 = new UserFriends;
@@ -70,7 +71,7 @@ class UserController extends AbstractController
         $addNewRelation2->setFriend($user);
         $addNewRelation2->setIsContested(false);
         $addNewRelation2->setIsAccepted(false);
-
+ */
 
         $manager->persist($addNewRelation2);
         $manager->flush();
@@ -100,12 +101,13 @@ class UserController extends AbstractController
      * @Route("/{id}", name="read", methods={"GET"})
      * 
      */
-    public function read(User $user, Request $request,UserFriendsRepository $userFriendsRepository)
+    public function read(int $id, Request $request, UserRepository $userRepository)
     {
 
+        $user = $userRepository->getFullUser($id);
 
         return $this->json(
-            $this->serializer->normalize($user, 'null', ['groups' => ['api_v1_users', 'api_v1_users_read', 'friends']])
+            $this->serializer->normalize($user, 'null', ['groups' => ['api_v1_users', 'api_v1_users_read']])
          );     
     }
 
@@ -115,11 +117,19 @@ class UserController extends AbstractController
     public function friendsList(User $user ,UserFriendsRepository $userFriendsRepository)
     {
 
-        $getFriend = $userFriendsRepository->getFriend($user);
 
-        $response = $getFriend[0]->getFriend()->getFriends();
+        // dd($getFriend);
+
+       // $response = $getFriend[0]->getFriend()->getFriends();
+
+        // dump($response);
+        // foreach ($response as $friend) {
+        //     $d = $friend;
+        // }
+
+        // dd($response);
     
-        $json =  $this->serializer->normalize($response, null, ['groups' => ['friends']]);
+        $json =  $this->serializer->normalize($friends, null, ['groups' => ['api_v1_users']]);
 
         return $this->json($json);
     }
