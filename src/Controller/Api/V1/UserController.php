@@ -8,6 +8,7 @@ use App\Entity\UserFriends;
 use App\Form\UserType;
 use App\Repository\UserRepository;
 use App\Repository\PlayRepository;
+use App\Repository\UserFriendsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\Persistence\ObjectManager;
@@ -16,6 +17,10 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
+
 
 /**
  * @Route("/api/v1/users", name="api_v1_user_")
@@ -32,41 +37,84 @@ class UserController extends ApiController
         $this->encoder = $encoder;
     }
 
+
+
     /**
      *
      * add friends 
-     * @Route("/{id}/requests/{id2}/friends", requirements={"id" = "\d+","id2" = "\d+"}, name="add_friends")
+     * @Route("/{id}/requests/{idFriend}/friends", requirements={"id" = "\d+","id2" = "\d+"}, name="friendRequest")
      * 
      */
-    public function friendRequest(User $user, $id2)
+    public function friendRequest(User $user, $idFriend)
     {
+        //dd($this->getUser());
 
-        $friend = $this->getDoctrine()->getRepository(User::class)->find($id2);
+        if ($this->getUser()->getId() !== $user->getId()) {
+            return $this->respondUnauthorized("t'as rien à faire là mon pote");
+        }
+
+
+        $friend = $this->getDoctrine()->getRepository(User::class)->find($idFriend);
         $manager = $this->getDoctrine()->getManager();
-        
+
         //add first lign for friend relation
         $addNewRelation = new UserFriends;
-        $addNewRelation->setUser($user);
-        $addNewRelation->setFriend($friend);
-        $addNewRelation->setIsContested(true);
+        $addNewRelation->setUser($friend);
+        $addNewRelation->setFriend($user);
         $addNewRelation->setIsAccepted(false);
-        //add second lign for same friend relation
+        $addNewRelation->setIsAnswered(false);
         $manager->persist($addNewRelation);
-        $addNewRelation2 = new UserFriends;
-        $addNewRelation2->setUser($friend);
-        $addNewRelation2->setFriend($user);
-        $addNewRelation2->setIsContested(false);
-        $addNewRelation2->setIsAccepted(false);
-        $manager->persist($addNewRelation2);
+
         $manager->flush();
         return $this->json([
-            'message' => 'coucou',
+            'message' => 'demande d\'ami envoyée',
         ], 201);
     }
 
+    /**
+     *
+     * add friends 
+     * @Route("/{id}/response/{idFriend}/friends/{bool}", requirements={"id" = "\d+","id2" = "\d+","bool" = "[01]"}, name="friendResponse")
+     * 
+     */
+    public function friendResponse(User $user, $idFriend, $bool)
+    {
 
 
+        if ($this->getUser()->getId() !== $user->getId()) {
+            return $this->respondUnauthorized("t'as rien à faire là mon pote");
+        }
+       
 
+        $friend = $this->getDoctrine()->getRepository(User::class)->find($idFriend);
+        $friendship = $this->getDoctrine()->getRepository(UserFriends::class)->getFriendship($user, $friend);
+
+        //add second lign for same friend relation
+        // and modify the first one
+
+
+        $addNewRelation = new UserFriends;
+        $addNewRelation->setUser($user);
+        $addNewRelation->setFriend($friend);
+        $addNewRelation->setIsAnswered(true);
+        $friendship->setIsAnswered(true);
+        if ($bool == 1) {
+            $friendship->setIsAccepted(true);
+            $addNewRelation->setIsAccepted(true);
+        } else {
+            $friendship->setIsAccepted(false);
+            $addNewRelation->setIsAccepted(false);
+        }
+
+        //Get Manager
+        $manager = $this->getDoctrine()->getManager();
+
+        $manager->persist($addNewRelation, $friendship);
+        $manager->flush();
+        return $this->json([
+            'message' => 'répondu'
+        ], 201);
+    }
 
     /**
      *
@@ -84,26 +132,16 @@ class UserController extends ApiController
      * @Route("/{id}", name="read", methods={"GET"})
      * 
      */
-    public function read(User $user, Request $request)
+    public function read(int $id, Request $request, UserRepository $userRepository)
     {
+
+        $user = $userRepository->getFullUser($id);
+
+
         return $this->json(
-            $this->serializer->normalize($user, null, ['groups' => ['api_v1_users', 'api_v1_us',]])
+            $this->serializer->normalize($user, 'null', ['groups' => ['api_v1_users', 'api_v1_users_read']])
         );
     }
-
-    /**
-     * @Route("/{id}/friends", name="friends", methods={"GET"})
-     */
-    public function friendsList(User $user,Request $request)
-    {
-        return $this->json(
-            $this->serializer->normalize($user, 'json', ['groups' => ['api_v1_users_friends']]));
-
-    }
-
-
-
-
 
     /**
      * @Route("", name="add", methods={"POST"})
@@ -169,7 +207,7 @@ class UserController extends ApiController
         }
     }
 
-    
+
     /**
      * @Route("/{id}/update", name="update",  methods={"GET","POST"})
      * 
@@ -242,7 +280,7 @@ class UserController extends ApiController
         $user->setIsActive(false);
         $manager->flush();
         return $this->json([
-            'message' => 'Vôtre compte à été banni',
+            'message' => 'Votre compte à été banni',
             'path' => 'src/Controller/Api/V1/UserController.php',
         ]);
     }

@@ -28,7 +28,6 @@ class GameController extends AbstractController
         ]);
     }
 
-
     /**
      *
      * @Route("/{id}/view", name="game_view", requirements={"id" = "\d+"}, methods={"GET"})

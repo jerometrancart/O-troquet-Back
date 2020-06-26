@@ -32,20 +32,20 @@ class UserFriends
     /**
      * @ORM\ManyToOne(targetEntity="User", inversedBy="friendsWithMe")
      * @MaxDepth(4)
-     *
      */
     private $friend;
-
    
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"api_v1_users"})
      */
-    private $is_accepted;
+    private $isAccepted;
 
     /**
      * @ORM\Column(type="boolean")
+     * @Groups({"api_v1_users"})
      */
-    private $isContested;
+    private $isAnswered;
 
 
     public function getId(): ?int
@@ -55,19 +55,16 @@ class UserFriends
 
     public function getIsAccepted(): ?bool
     {
-        return $this->is_accepted;
+        return $this->isAccepted;
     }
 
-    public function setIsAccepted(bool $is_accepted): self
+    public function setIsAccepted(bool $isAccepted): self
     {
-        $this->is_accepted = $is_accepted;
+        $this->isAccepted = $isAccepted;
 
         return $this;
     }
 
-    /*
-     * @Groups({"api_v1_users_friends"})
-     */
     public function getUser(): ?User
     {
         return $this->user;
@@ -92,26 +89,27 @@ class UserFriends
         return $this;
     }
 
-    public function getIsRequested(): ?bool
+    
+
+    /**
+     * @Groups({"api_v1_users"})
+     */
+    public function getFriendDetails()
     {
-        return $this->is_requested;
+        return [
+            'id' => $this->friend->getId(),
+            'username' => $this->friend->getUsername(),
+        ];
     }
 
-    public function setIsRequested(bool $is_requested): self
+    public function getIsAnswered(): ?bool
     {
-        $this->is_requested = $is_requested;
-
-        return $this;
+        return $this->isAnswered;
     }
 
-    public function getIsContested(): ?bool
+    public function setIsAnswered(bool $isAnswered): self
     {
-        return $this->isContested;
-    }
-
-    public function setIsContested(bool $isContested): self
-    {
-        $this->isContested = $isContested;
+        $this->isAnswered = $isAnswered;
 
         return $this;
     }
