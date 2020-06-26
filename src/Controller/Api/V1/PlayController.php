@@ -63,7 +63,7 @@ class PlayController extends ApiController
     public function list(PlayRepository $playRepository)
     {
         $play = $playRepository->findAll();
-        dd($play);
+       // dd($play);
 
 
         $json = $this->serializer->normalize($play, null, ['groups' => 'api_v1_play']);

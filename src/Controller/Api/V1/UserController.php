@@ -2,8 +2,7 @@
 
 namespace App\Controller\Api\V1;
 
-
-
+use App\Entity\Play;
 use App\Entity\User;
 use App\Entity\UserFriends;
 use App\Form\UserType;
@@ -21,10 +20,8 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 /**
  * @Route("/api/v1/users", name="api_v1_user_")
  */
-class UserController extends AbstractController
+class UserController extends ApiController
 {
-
-
     private $objetNormalizer;
     private $encoder;
 
@@ -33,10 +30,8 @@ class UserController extends AbstractController
         $this->normalizer = $objetNormalizer;
         $this->serializer = new Serializer([$objetNormalizer]);
         $this->encoder = $encoder;
-
     }
 
-   
     /**
      *
      * add friends 
@@ -62,14 +57,16 @@ class UserController extends AbstractController
         $addNewRelation2->setFriend($user);
         $addNewRelation2->setIsContested(false);
         $addNewRelation2->setIsAccepted(false);
-
-
         $manager->persist($addNewRelation2);
         $manager->flush();
         return $this->json([
             'message' => 'coucou',
         ], 201);
     }
+
+
+
+
 
     /**
      *
@@ -78,11 +75,8 @@ class UserController extends AbstractController
      */
     public function list(UserRepository $userRepository)
     {
-
         $users = $userRepository->findAll();
-
         $json = $this->serializer->normalize($users, null, ['groups' => 'api_v1_users']);
-
         return $this->json($json);
     }
 
@@ -92,7 +86,6 @@ class UserController extends AbstractController
      */
     public function read(User $user, Request $request)
     {
-
         return $this->json(
             $this->serializer->normalize($user, null, ['groups' => ['api_v1_users', 'api_v1_us',]])
         );
@@ -103,12 +96,11 @@ class UserController extends AbstractController
      */
     public function friendsList(User $user,Request $request)
     {
-
-
         return $this->json(
             $this->serializer->normalize($user, 'json', ['groups' => ['api_v1_users_friends']]));
 
     }
+
 
 
 
@@ -260,7 +252,6 @@ class UserController extends AbstractController
      */
     public function stats(User $user, Request $request)
     {
-
         return $this->json(
             $this->serializer->normalize($user, null, ['groups' => ['api_v1_users_stat']])
         );
