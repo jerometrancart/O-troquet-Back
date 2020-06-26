@@ -29,21 +29,13 @@ class UserFriendsRepository extends ServiceEntityRepository
 
         // je crée un querybuilder sur l'objet User avec l'alias 'user'
         $builder = $this->createQueryBuilder('Friendship');
-        // je met ma condition de recherche
+     
         $builder->where("Friendship.user = :user");
         $builder->andWhere("Friendship.friend = :friend");
-        // J'ajoute la valeur du parametre utilisé dans ma condition
         $builder->setParameter('user', $user);
         $builder->setParameter('friend', $friend);
-        // je crée une jointure avec la table play
-        // $builder->leftJoin('user.plays', 'play');
-        // // J'ajoute les stats au select pour que doctrine alimente les objets associés
-        // $builder->addSelect('play');
-        
-        // j'execute la requete
         $query = $builder->getQuery();
-       // dd($query);
-        // je recupére le resultat non pas sous la forme d'un tableau mais un ou 0 objets
+      
         $result = $query->getOneOrNullResult();
         return $result;
     }

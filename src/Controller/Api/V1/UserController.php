@@ -53,12 +53,11 @@ class UserController extends ApiController
             return $this->respondUnauthorized("t'as rien à faire là mon pote");
         }
 
-        $friend = $this->getDoctrine()->getRepository(User::class)->find($idFriend);
         $friendship = $this->getDoctrine()->getRepository(UserFriends::class)->getFriendship($user, $idFriend);
 
         //check if the relation does not exist yet 
         if ($friendship !== null) {
-            return $this->respondUnauthorized("Demande d'ami déja envoyé");
+            return $this->respondUnauthorized("Demande d'ami déja envoyée");
         }
         $friend = $this->getDoctrine()->getRepository(User::class)->find($idFriend);
         $manager = $this->getDoctrine()->getManager();
@@ -70,10 +69,9 @@ class UserController extends ApiController
         $addNewRelation->setIsAccepted(false);
         $addNewRelation->setIsAnswered(false);
         $manager->persist($addNewRelation);
-
         $manager->flush();
         return $this->respondCreated([
-            'message' => sprintf('demande d\'ami envoyée a %s ', $friend->getUsername())
+            'message' => sprintf('demande d\'ami envoyée à %s ', $friend->getUsername())
         ]);
     }
 
@@ -103,7 +101,7 @@ class UserController extends ApiController
 
 
         if ($friendshipReverse !== null) {
-            return $this->respondUnauthorized("Vous avez déjà répondu à cette invitation à");
+            return $this->respondUnauthorized("Vous avez déjà répondu à cette invitation");
         };
         //add second lign for same relationship 
         $addNewRelation = new UserFriends;
@@ -128,7 +126,7 @@ class UserController extends ApiController
 
         if ($bool == 1) {
             return $this->respondCreated([
-                'message' => sprintf('vous êtes désormais amis avec %s', $friendUsername)
+                'message' => sprintf('vous êtes désormais ami(e) avec %s', $friendUsername)
             ], 201);
         } else {
             return $this->respondCreated([
@@ -148,7 +146,7 @@ class UserController extends ApiController
     {
 
 
-        // check if the user is the one who sends the unfriend 
+        // check if the user is the one who sends the unfriend  
         if ($this->getUser()->getId() !== $user->getId()) {
             return $this->respondUnauthorized("t'as rien à faire là mon pote");
         }
@@ -159,18 +157,25 @@ class UserController extends ApiController
         if ($friendship === null) {
             return $this->respondUnauthorized("Cette relation n'existe pas");
         };
+
+
         //dd($friendship,$friendshipReverse);
         $manager = $this->getDoctrine()->getManager();
         $manager->remove($friendship);
-        $manager->remove($friendshipReverse);
+        if ($friendshipReverse !== null) {
+            $manager->remove($friendshipReverse);
+        }
         $manager->flush();
 
         $friend = $this->getDoctrine()->getRepository(User::class)->find($idFriend);
 
         return $this->respondCreated([
-            'message' => sprintf('Vous avez supprimé %s de votre liste d\'ami', $friend->getUsername())
+            'message' => sprintf('Vous avez supprimé %s de votre liste d\'amis', $friend->getUsername())
         ], 201);
     }
+
+
+
 
 
     /**
