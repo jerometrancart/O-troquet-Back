@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\MailerService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -26,10 +27,25 @@ class UserController extends AbstractController
      */
     public function index(UserRepository $userRepository): Response
     {
+
+
         return $this->render('user/index.html.twig', [
             'users' => $userRepository->findAll(),
         ]);
     }
+
+    /**
+     * @Route("/admin", name="admin_index", methods={"GET"})
+     */
+    public function indexAdmin(UserRepository $userRepository): Response
+    {
+
+
+        return $this->render('admin/index.html.twig', [
+            'users' => $userRepository->findAll(),
+        ]);
+    }
+
 
     /**
      * @Route("/{id}/profil", name="user_profil", methods={"GET", "POST"})
@@ -58,6 +74,8 @@ class UserController extends AbstractController
      */
     public function banned(User $user, MailerInterface $mailer,UserRepository $userRepository)
     {
+
+        $mailerService = new MailerService($mailer);
         // je recupère mon entité
         $user = $this->getDoctrine()->getRepository(User::class)->find($user);
         // je demande le manager
@@ -67,23 +85,24 @@ class UserController extends AbstractController
 
         // je demande au manager d'executer dans la BDD toute les modifications qui ont été faites sur les entités
         $manager->flush();
-        $email = (new TemplatedEmail())
-        ->from('essaiphpmailer@gmail.com')
-        ->to($user->getEmail())
-        //->cc('cc@example.com')
-        //->bcc('bcc@example.com')
-        //->replyTo('fabien@example.com')
-        //->priority(Email::PRIORITY_HIGH)
-        ->subject('O\'troquet ')
-        ->text('Sending emails is fun again!')
-        ->htmlTemplate('user/banned.html.twig')
-        ->context([
-                'expiration_date' => new \DateTime('+7 days'),
-                'username' => $user,
-            ]);
+        $to = $user->getEmail();
 
-            
-        $mailer->send($email);
+
+        /*
+                $email = (new TemplatedEmail())
+                ->from('essaiphpmailer@gmail.com')
+                ->to($user->getEmail())
+                ->subject('O\'troquet ')
+                ->text('Sending emails is fun again!')
+                ->htmlTemplate('user/banned.html.twig')
+                ->context([
+                        'username' => $user,
+                    ]);
+
+                $mailer->send($email); */
+        $mailerService->sendToken($token = [], $to, $user,$tokenLifeTime = [],'Compte banni','user/banned.html.twig');
+
+
 
 
         return $this->render('user/index.html.twig', [
@@ -152,5 +171,7 @@ class UserController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+
+
 
 }

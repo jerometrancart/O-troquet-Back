@@ -66,6 +66,7 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
 
+        - { path: ^/user/profil, roles: ROLE_USER }
         - { path: ^/api/register, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/account/confirm, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/reset-password, roles: IS_AUTHENTICATED_ANONYMOUSLY }
@@ -73,12 +74,11 @@ security:
         - { path: ^/api/v1/users, roles: IS_AUTHENTICATED_FULLY}
         - { path: ^/confirm_account, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/(login|register), roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/user/admin, roles: ROLE_SUPER_ADMIN }
         - { path: ^/user, roles: ROLE_ADMIN }
         - { path: '(update|view|banned|unbanned|edit)', roles: ROLE_ADMIN }
         - { path: ^/admin , roles: ROLE_SUPER_ADMIN }
-        - { path: ^/\w+, roles: ROLE_USER }
+
 
 
     role_hierarchy:
