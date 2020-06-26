@@ -7,14 +7,9 @@ use App\Entity\User;
 use App\Form\ChangePasswordFormType;
 use App\Form\ResetPasswordRequestFormType;
 use App\Service\MailerService;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use SymfonyCasts\Bundle\ResetPassword\Controller\ResetPasswordControllerTrait;
@@ -65,7 +60,6 @@ class ResetPasswordController extends ApiController
            // dd($form->getErrors());
             return $this->json((string) $form->getErrors(true), 400);
         }
-
     }
 
     /**
@@ -177,15 +171,13 @@ class ResetPasswordController extends ApiController
         $email = $user->getEmail();
         $username = $user->getUsername(); 
         $tokenLifeTime = $this->resetPasswordHelper->getTokenLifetime();
+        $tokenLifeTimeInHour = ($tokenLifeTime / 3600);
       
-    
-        $mailer->send($email); 
+
         $mailerService->sendToken($resetToken,$email,$username,$tokenLifeTime,'Your password reset request','reset_password/email.html.twig');
     
 
-       
-
-        return $this->respondWithSuccess(sprintf('Un email contenant le lien pour mofifier votre mot de passe vous a été envoyé, il expirera dans %s heure',$this->resetPasswordHelper->getTokenLifetime()));
+        return $this->respondWithSuccess(sprintf('Un email contenant le lien pour mofifier votre mot de passe vous a été envoyé, il expirera dans %s heure',$tokenLifeTimeInHour));
 
         
     }

@@ -25,8 +25,9 @@ security:
                 success_handler:          lexik_jwt_authentication.handler.authentication_success
                 failure_handler:          lexik_jwt_authentication.handler.authentication_failure
 
-        users:
-            pattern:   ^/api/v1/users
+                
+        api:
+            pattern:   ^/api/v1
             stateless: true
             guard:
                 authenticators:
@@ -64,17 +65,21 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
+
+        - { path: ^/user/profil, roles: ROLE_USER }
         - { path: ^/api/register, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/account/confirm, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/reset-password, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api/v1/users, roles: IS_AUTHENTICATED_FULLY}
         - { path: ^/confirm_account, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/(login|register), roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/user/admin, roles: ROLE_SUPER_ADMIN }
         - { path: ^/user, roles: ROLE_ADMIN }
         - { path: '(update|view|banned|unbanned|edit)', roles: ROLE_ADMIN }
-        - { path: ^/\w+, roles: ROLE_USER }
+        - { path: ^/admin , roles: ROLE_SUPER_ADMIN }
+
+
 
     role_hierarchy:
         ROLE_SUPER_ADMIN : ROLE_ADMIN
