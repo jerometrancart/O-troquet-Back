@@ -35,8 +35,6 @@ class UserRepository extends ServiceEntityRepository
         // J'ajoute les stats au select pour que doctrine alimente les objets associés
         $builder->addSelect('play');
 
-
-
         // j'execute la requete
         $query = $builder->getQuery();
         // je recupére le resultat non pas sous la forme d'un tableau mais un ou 0 objets
@@ -44,7 +42,6 @@ class UserRepository extends ServiceEntityRepository
 
         return $result;
     }
-
     public function friendsList($id)
     {
 
@@ -59,8 +56,6 @@ class UserRepository extends ServiceEntityRepository
         // J'ajoute les stats au select pour que doctrine alimente les objets associés
         $builder->addSelect('friends');
 
-
-
         // j'execute la requete
         $query = $builder->getQuery();
         // je recupére le resultat non pas sous la forme d'un tableau mais un ou 0 objets
@@ -68,5 +63,23 @@ class UserRepository extends ServiceEntityRepository
 
         return $result;
     }
+
+    public function getFullUser(int $id)
+    {
+        $em = $this->getEntityManager();
+
+
+        $query =  $em->createQuery('
+        SELECT u, uf, f
+        FROM App\Entity\User as u
+        LEFT JOIN u.friends as uf
+        LEFT JOIN uf.friend as f
+        WHERE u.id = :user
+        ')
+            ->setParameter('user', $id);
+
+        return $result = $query->getResult();
+    }
+
 
 }

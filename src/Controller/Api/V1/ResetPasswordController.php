@@ -39,25 +39,25 @@ class ResetPasswordController extends ApiController
     public function request(Request $request, MailerInterface $mailer): Response
     {
 
-       // $user = new User;
+        // $user = new User;
 
-        $form = $this->createForm(ResetPasswordRequestFormType::class, null,['csrf_protection' => false]);
-       // $form->handleRequest($request);;
-       $json = json_decode($request->getContent(),true);
+        $form = $this->createForm(ResetPasswordRequestFormType::class, null, ['csrf_protection' => false]);
+        // $form->handleRequest($request);;
+        $json = json_decode($request->getContent(), true);
 
 
-    
-       $form->submit($json);
+
+        $form->submit($json);
 
         //dd($json);
         if ($form->isValid()) {
-           //dd($form->get('email')->getData());
+            //dd($form->get('email')->getData());
             return $this->processSendingPasswordResetEmail(
                 $form->get('email')->getData(),
                 $mailer,
             );
         } else {
-           // dd($form->getErrors());
+            // dd($form->getErrors());
             return $this->json((string) $form->getErrors(true), 400);
         }
     }
@@ -69,13 +69,13 @@ class ResetPasswordController extends ApiController
      */
     public function checkEmail(): Response
     {
-      
+
         // We prevent users from directly accessing this page
         if (!$this->canCheckEmail()) {
             return $this->redirectToRoute('app_forgot_password_request');
         }
 
-        return $this->respondWithSuccess(sprintf('Un email contenant le lien pour mofifier votre mot de passe vous a été envoyé, il expirera dans %s heure',2));
+        return $this->respondWithSuccess(sprintf('Un email contenant le lien pour mofifier votre mot de passe vous a été envoyé, il expirera dans %s heure', 2));
     }
 
     /**
@@ -141,8 +141,8 @@ class ResetPasswordController extends ApiController
 
     private function processSendingPasswordResetEmail(string $emailFormData, MailerInterface $mailer)
     {
-     
-    
+
+
         $mailerService = new MailerService($mailer);
         $user = $this->getDoctrine()->getRepository(User::class)->findOneBy([
             'email' => $emailFormData,
@@ -154,31 +154,27 @@ class ResetPasswordController extends ApiController
         if (!$user) {
             return $this->redirectToRoute('app_check_email');
         }
-        
-        try {
-           
-            $resetToken = $this->resetPasswordHelper->generateResetToken($user);
 
+        try {
+
+            $resetToken = $this->resetPasswordHelper->generateResetToken($user);
         } catch (ResetPasswordExceptionInterface $e) {
             return $this->json(sprintf(
                 'There was a problem handling your password reset request - %s',
                 $e->getReason()
             ));
-                
         }
-       
+
 
         $email = $user->getEmail();
-        $username = $user->getUsername(); 
+        $username = $user->getUsername();
         $tokenLifeTime = $this->resetPasswordHelper->getTokenLifetime();
         $tokenLifeTimeInHour = ($tokenLifeTime / 3600);
-      
 
-        $mailerService->sendToken($resetToken,$email,$username,$tokenLifeTime,'Your password reset request','reset_password/email.html.twig');
-    
 
-        return $this->respondWithSuccess(sprintf('Un email contenant le lien pour mofifier votre mot de passe vous a été envoyé, il expirera dans %s heure',$tokenLifeTimeInHour));
+        $mailerService->sendToken($resetToken, $email, $username, $tokenLifeTime, 'résiliation de votre mot de passe', 'reset_password/email.html.twig');
 
-        
+
+        return $this->respondWithSuccess(sprintf('Un email contenant le lien pour mofifier votre mot de passe vous a été envoyé, il expirera dans %s heure', $tokenLifeTimeInHour));
     }
 }

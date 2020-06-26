@@ -49,7 +49,7 @@ class AuthController extends ApiController
 
         if ($form->isValid()) {
 
-            //dd($user->getEmail());
+
 
             $confirmationToken = $user->setConfirmationToken($this->generateToken());
             $user->setPassword($encoder->encodePassword($user, $user->getPassword()));
@@ -63,6 +63,7 @@ class AuthController extends ApiController
             $tokenLifeTime = $this->resetPasswordHelper->getTokenLifetime();
             $username = $user->getUsername();
 
+        
 
             $mailerService->sendToken($confirmationToken, $to, $username, $tokenLifeTime, 'Confirmation ', 'registration/email.html.twig');
 
@@ -83,8 +84,7 @@ class AuthController extends ApiController
     public function confirmAccount($token, $username): Response
     {
 
-       
-
+        
         $em = $this->getDoctrine()->getManager();
         $user = $em->getRepository(User::class)->findOneBy(['username' => $username]);
         $tokenExist = $user->getConfirmationToken();

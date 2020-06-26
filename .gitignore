@@ -18,4 +18,6 @@
 /config/jwt/*.pem
 ###< lexik/jwt-authentication-bundle ###
 
-
+###> mercure ###
+updates.db
+###< mercure ###
