@@ -2,8 +2,7 @@
 
 namespace App\Controller\Api\V1;
 
-
-
+use App\Entity\Play;
 use App\Entity\User;
 use App\Entity\UserFriends;
 use App\Form\UserType;
@@ -28,8 +27,6 @@ use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
  */
 class UserController extends ApiController
 {
-
-
     private $objetNormalizer;
     private $encoder;
 
@@ -41,13 +38,12 @@ class UserController extends ApiController
     }
 
 
+
     /**
      *
      * add friends 
      * @Route("/{id}/requests/{idFriend}/friends", requirements={"id" = "\d+","id2" = "\d+"}, name="friendRequest")
      * 
-     * 
-     *
      */
     public function friendRequest(User $user, $idFriend)
     {
@@ -127,11 +123,8 @@ class UserController extends ApiController
      */
     public function list(UserRepository $userRepository)
     {
-
         $users = $userRepository->findAll();
-
         $json = $this->serializer->normalize($users, null, ['groups' => 'api_v1_users']);
-
         return $this->json($json);
     }
 
@@ -143,6 +136,7 @@ class UserController extends ApiController
     {
 
         $user = $userRepository->getFullUser($id);
+
 
         return $this->json(
             $this->serializer->normalize($user, 'null', ['groups' => ['api_v1_users', 'api_v1_users_read']])
@@ -296,7 +290,6 @@ class UserController extends ApiController
      */
     public function stats(User $user, Request $request)
     {
-
         return $this->json(
             $this->serializer->normalize($user, null, ['groups' => ['api_v1_users_stat']])
         );
