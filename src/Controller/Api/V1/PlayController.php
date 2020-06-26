@@ -50,7 +50,8 @@ class PlayController extends ApiController
         $em = $this->getDoctrine()->getManager();
         $em->persist($play);
         $em->flush();
-      //  $json = $this->serializer->normalize($play, null, ['groups' => 'api_v1_game']);
+      
+        //  $json = $this->serializer->normalize($play, null, ['groups' => 'api_v1_game']);
 
       return $this->respondCreated();
     

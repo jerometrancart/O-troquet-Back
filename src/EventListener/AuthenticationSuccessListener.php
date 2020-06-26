@@ -23,6 +23,7 @@ class AuthenticationSuccessListener
         }
 
         $data['metadata'] = array(
+            'user_id' => $user->getId(),
             'active' => $user->getIsActive(),
             'banned' => $user->getIsBanned(),
         );

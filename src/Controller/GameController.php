@@ -17,14 +17,10 @@ class GameController extends AbstractController
      */
     public function list(Request $request) {
 
-
-
         $games = $this->getDoctrine()->getRepository(Game::class)->findAll();
 
         return $this->render('game/list.html.twig', [
             "games" => $games,
-
-
         ]);
     }
 

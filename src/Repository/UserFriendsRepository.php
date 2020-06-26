@@ -22,7 +22,7 @@ class UserFriendsRepository extends ServiceEntityRepository
 
 
 
-    public function getFriendship(User $user,  $friend)
+    public function getFriendship($user, $friend)
     {
 
       //  dd($user, $friend);
@@ -33,19 +33,18 @@ class UserFriendsRepository extends ServiceEntityRepository
         $builder->where("Friendship.user = :user");
         $builder->andWhere("Friendship.friend = :friend");
         // J'ajoute la valeur du parametre utilisé dans ma condition
-        $builder->setParameter('user', $user->getId());
+        $builder->setParameter('user', $user);
         $builder->setParameter('friend', $friend);
         // je crée une jointure avec la table play
         // $builder->leftJoin('user.plays', 'play');
         // // J'ajoute les stats au select pour que doctrine alimente les objets associés
         // $builder->addSelect('play');
-
         
         // j'execute la requete
         $query = $builder->getQuery();
        // dd($query);
         // je recupére le resultat non pas sous la forme d'un tableau mais un ou 0 objets
-        $result = $query->getSingleResult();
+        $result = $query->getOneOrNullResult();
         return $result;
     }
 
@@ -66,55 +65,6 @@ class UserFriendsRepository extends ServiceEntityRepository
 
 
 
-        /* 
-            SELECT u.id, u.username , f.is_accepted, f.is_contested  ,us.id , us.username
-            FROM user_friends as  f
-            JOIN user as u ON (f.user_id = u.id)
-            JOIN user as us ON (f.friend_id = us.id )
-            WHERE user_id = 68
- */
-        /*
-
-
-         SELECT f
-        FROM App\Entity\UserFriends as f
-        WHERE f.user = :user
-        
-        SELECT u.id, u.username , f.is_accepted, f.is_contested  ,us.id , us.username
-FROM user_friends as  f
-JOIN user as u ON (f.user_id = u.id)
-JOIN user as us ON (f.friend_id = us.id )
-WHERE user_id = 68
-
-        SELECT u.username
-        FROM App\Entity\UserFriends as f
-        INNER JOIN App\Entity\User as u 
-        ON (f.user.id = u.id)
-        WHERE user = :user
-
-            SELECT u.username
-            FROM App\Entity\UserFriends f
-            INNER JOIN App\Entity\User u ON (f.user.id = u.id)
-            WHERE user = :user
-
-            SELECT u.username
-FROM App\Entity\UserFriends as  f
-INNER JOIN App\Entity\User as u ON (f.user_id = u.id)
-WHERE user_id = user
-
-            // Requete si problematique circular reference
-
-            SELECT u1.username
-            FROM App\Entity\User as u1
-            WHERE u1.id  = :user
-
-            AND u.friend IN (
-                SELECT uf2.id
-                FROM App\Entity\UserFriends uf2
-                WHERE uf2.user = :user
-            )
-        
-        */
         return $result = $query->getResult();
     }
 

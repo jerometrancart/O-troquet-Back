@@ -47,28 +47,34 @@ class UserController extends ApiController
      */
     public function friendRequest(User $user, $idFriend)
     {
-        //dd($this->getUser());
 
+        // check if the user is the one who sends friend's request
         if ($this->getUser()->getId() !== $user->getId()) {
             return $this->respondUnauthorized("t'as rien à faire là mon pote");
         }
 
+        $friend = $this->getDoctrine()->getRepository(User::class)->find($idFriend);
+        $friendship = $this->getDoctrine()->getRepository(UserFriends::class)->getFriendship($user, $idFriend);
 
+        //check if the relation does not exist yet 
+        if ($friendship !== null) {
+            return $this->respondUnauthorized("Demande d'ami déja envoyé");
+        }
         $friend = $this->getDoctrine()->getRepository(User::class)->find($idFriend);
         $manager = $this->getDoctrine()->getManager();
 
         //add first lign for friend relation
         $addNewRelation = new UserFriends;
-        $addNewRelation->setUser($friend);
-        $addNewRelation->setFriend($user);
+        $addNewRelation->setUser($user);
+        $addNewRelation->setFriend($friend);
         $addNewRelation->setIsAccepted(false);
         $addNewRelation->setIsAnswered(false);
         $manager->persist($addNewRelation);
 
         $manager->flush();
-        return $this->json([
-            'message' => 'demande d\'ami envoyée',
-        ], 201);
+        return $this->respondCreated([
+            'message' => sprintf('demande d\'ami envoyée a %s ', $friend->getUsername())
+        ]);
     }
 
     /**
@@ -79,24 +85,32 @@ class UserController extends ApiController
      */
     public function friendResponse(User $user, $idFriend, $bool)
     {
-
-
+        // check if the user is the one who requests friend's request
         if ($this->getUser()->getId() !== $user->getId()) {
             return $this->respondUnauthorized("t'as rien à faire là mon pote");
         }
-       
 
         $friend = $this->getDoctrine()->getRepository(User::class)->find($idFriend);
-        $friendship = $this->getDoctrine()->getRepository(UserFriends::class)->getFriendship($user, $friend);
+        $friendship = $this->getDoctrine()->getRepository(UserFriends::class)->getFriendship($idFriend, $user);
 
-        //add second lign for same friend relation
-        // and modify the first one
+        //check if the first relation ($user -> $friend) exists (second security, may i delete later)
+        if ($friendship == null) {
+            return $this->respondUnauthorized("cette relation n'existe pas");
+        };
+
+        //check if the second relation ($friend -> $user ) does not exist
+        $friendshipReverse = $this->getDoctrine()->getRepository(UserFriends::class)->getFriendship($user, $idFriend);
 
 
+        if ($friendshipReverse !== null) {
+            return $this->respondUnauthorized("Vous avez déjà répondu à cette invitation à");
+        };
+        //add second lign for same relationship 
         $addNewRelation = new UserFriends;
         $addNewRelation->setUser($user);
         $addNewRelation->setFriend($friend);
         $addNewRelation->setIsAnswered(true);
+        // and modify the first one
         $friendship->setIsAnswered(true);
         if ($bool == 1) {
             $friendship->setIsAccepted(true);
@@ -108,13 +122,57 @@ class UserController extends ApiController
 
         //Get Manager
         $manager = $this->getDoctrine()->getManager();
-
         $manager->persist($addNewRelation, $friendship);
         $manager->flush();
-        return $this->json([
-            'message' => 'répondu'
+
+        $friendUsername =  $friend->getUsername();
+
+        if ($bool == 1) {
+            return $this->respondCreated([
+                'message' => sprintf('vous êtes désormais amis avec %s', $friendUsername)
+            ], 201);
+        } else {
+            return $this->respondCreated([
+                'message' => sprintf('vous avez décliné à la demande d\'ami de %s', $friendUsername)
+            ], 201);
+        }
+    }
+
+
+    /**
+     *
+     * add friends 
+     * @Route("/{id}/unfriend/{idFriend}", requirements={"id" = "\d+","id2" = "\d+"}, name="unfriend")
+     * 
+     */
+    public function unfriend(User $user, $idFriend)
+    {
+
+
+        // check if the user is the one who sends the unfriend 
+        if ($this->getUser()->getId() !== $user->getId()) {
+            return $this->respondUnauthorized("t'as rien à faire là mon pote");
+        }
+
+        $friendship = $this->getDoctrine()->getRepository(UserFriends::class)->getFriendship($user, $idFriend);
+        $friendshipReverse = $this->getDoctrine()->getRepository(UserFriends::class)->getFriendship($idFriend, $user);
+
+        if ($friendship === null) {
+            return $this->respondUnauthorized("Cette relation n'existe pas");
+        };
+        //dd($friendship,$friendshipReverse);
+        $manager = $this->getDoctrine()->getManager();
+        $manager->remove($friendship);
+        $manager->remove($friendshipReverse);
+        $manager->flush();
+
+        $friend = $this->getDoctrine()->getRepository(User::class)->find($idFriend);
+
+        return $this->respondCreated([
+            'message' => sprintf('Vous avez supprimé %s de votre liste d\'ami', $friend->getUsername())
         ], 201);
     }
+
 
     /**
      *
@@ -138,7 +196,7 @@ class UserController extends ApiController
         $user = $userRepository->getFullUser($id);
 
 
-        return $this->json(
+        return $this->respondWithSuccess(
             $this->serializer->normalize($user, 'null', ['groups' => ['api_v1_users', 'api_v1_users_read']])
         );
     }
@@ -149,61 +207,25 @@ class UserController extends ApiController
      */
     public function new(Request $request, ObjectNormalizer $objetNormalizer)
     {
-        // Depuis l'installation du JWT, on peut retrouver l'utilisateur connecté
-        // comme si on avait une session classique avec un cookie
-        // Pour retrouver l'utilisateur :
-        // $user = $this->getUser();
-        // dd($user);
-        // On pourrait par exemple vérifier le rôle de l'utilisateur ici
-        // Encore mieux, on pourrait utiliser des Voters pour vérifier que cet utilisateur a le droir «add» sur $movie
-
-
-        // Pour créer un nouveau Movie depuis une requête en API
-        // on peut utiliser les formulaires
-        // La structure des données permettra d'associer
-        // les propriétés du JSON aux champs de notre formulaire
-
         $user = new User();
-
-        // L'option supplémentaire permet de ne pas vérifier le token CSRF
-        // Comme on est en API, les requêtes sont forcément forgées,
-        // elles proviennent d'utilisateurs qu'on pourra identifier, la protection CSRF est injustifiée ici
         $form = $this->createForm(UserType::class, $user, ['csrf_protection' => false]);
-
-        // L'option true (deuxième argument de json_decode(), permet de spécifier qu'on veut un arra yet pas un objet)
         $json = json_decode($request->getContent(), true);
-        //dd($json);
-        // On simule l'envoi du formulaire
         $form->submit($json);
 
-
-        // On vérifie que les données reçues sont valides selon les contraintes de validation qu'on connait
         if ($form->isValid()) {
 
-            // Ça y est, les données de la requête ont été associées à notre formulaire puis à $movie
-            // Il ne reste plus qu'à persister $movie
             $user->setPassword($this->encoder->encodePassword($user, $user->getPassword()));
             $em = $this->getDoctrine()->getManager();
             $em->persist($user);
             $em->flush();
 
-            // Tout a bien fonctionné, on sérialise $movie pour l'afficher
-            // Ça sert de confirmation
             $serializer = new Serializer([$objetNormalizer]);
             $userJson = $serializer->normalize($user, null, ['groups' => 'api_v1_users']);
 
-            // On précise le code de status de réponse 201 Created
             return $this->json($userJson, 201);
         } else {
-            // Si le formulaire n'est pas valide, on peut renvoyer les erreurs
-            // Attention il s'agit d'une chaine de caractères qui n'explique pas grand chose,
-            // Ce n'est pas du JSON, il y a sûrement un moyen, à la main, de sérialiser les erreurs mieux que ça
-            // On précise également le code de status de réponse : 400
-            // (string) c'est pour parser (transformer) notre objet en string
-
             ($form->getErrors(true));
-
-            return $this->json((string) $form->getErrors(true), 400);
+            return $this->respondWithErrors((string) $form->getErrors(true), 400);
         }
     }
 
@@ -223,26 +245,30 @@ class UserController extends ApiController
         // On simule l'envoi du formulaire
         $form->submit($json);
         if ($form->isValid()) {
-
             $user->setPassword($this->encoder->encodePassword($user, $user->getPassword()));
             $manager = $this->getDoctrine()->getManager();
-            // Pas besoin de persist, l'objet manipulé est déjà connu du manager
+
+
             $manager->flush();
             $serializer = new Serializer([$objetNormalizer]);
             $userJson = $serializer->normalize($user, null, ['groups' => 'api_v1_users']);
-
-            // On précise le code de status de réponse 201 Created
-            return $this->json($userJson, 201);
+            return $this->respondWithSuccess($userJson, 201);
         } else {
-            // Si le formulaire n'est pas valide, on peut renvoyer les erreurs
-            // Attention il s'agit d'une chaine de caractères qui n'explique pas grand chose,
-            // Ce n'est pas du JSON, il y a sûrement un moyen, à la main, de sérialiser les erreurs mieux que ça
-            // On précise également le code de status de réponse : 400
-            // (string) c'est pour parser (transformer) notre objet en string
+
             ($form->getErrors(true));
 
-            return $this->json((string) $form->getErrors(true), 400);
+            return $this->respondWithErrors((string) $form->getErrors(true), 400);
         }
+    }
+
+    /**
+     * @Route("/{id}/stats", name="stats", methods={"GET"})
+     */
+    public function stats(User $user, Request $request)
+    {
+        return $this->json(
+            $this->serializer->respondWithSuccess($user, null, ['groups' => ['api_v1_users_stat']])
+        );
     }
 
 
@@ -260,9 +286,8 @@ class UserController extends ApiController
         $manager->remove($user);
         // je demande au manager d'executer dans la BDD toute les modifications qui ont été faites sur les entités
         $manager->flush();
-        return $this->json([
-            'message' => 'Vôtre compte a bien supprimé',
-            'path' => 'src/Controller/Api/V1/UserController.php',
+        return $this->respondWithSuccess([
+            'message' => 'Votre compte a bien supprimé',
         ]);
     }
 
@@ -271,6 +296,7 @@ class UserController extends ApiController
      * @Route("/{id}/banned", name="banned",methods={"GET","POST"})
      * @IsGranted("ROLE_ADMIN")
      */
+    // For V2 
     public function banned($id)
     {
         $user = $this->getDoctrine()->getRepository(User::class)->find($id);
@@ -279,19 +305,8 @@ class UserController extends ApiController
 
         $user->setIsActive(false);
         $manager->flush();
-        return $this->json([
-            'message' => 'Votre compte à été banni',
-            'path' => 'src/Controller/Api/V1/UserController.php',
+        return $this->respondWithSuccess([
+            'message' => 'Le compte à été banni',
         ]);
-    }
-
-    /**
-     * @Route("/{id}/stats", name="stats", methods={"GET"})
-     */
-    public function stats(User $user, Request $request)
-    {
-        return $this->json(
-            $this->serializer->normalize($user, null, ['groups' => ['api_v1_users_stat']])
-        );
     }
 }
