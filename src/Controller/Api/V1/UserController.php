@@ -119,7 +119,6 @@ class UserController extends ApiController
             $friendship->setIsAccepted(false);
             $addNewRelation->setIsAccepted(false);
         }
-
         //Get Manager
         $manager = $this->getDoctrine()->getManager();
         $manager->persist($addNewRelation, $friendship);
