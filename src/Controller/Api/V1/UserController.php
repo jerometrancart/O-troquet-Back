@@ -183,6 +183,7 @@ class UserController extends ApiController
     public function read(int $id, Request $request, UserRepository $userRepository)
     {
 
+
         $user = $userRepository->getFullUser($id);
         return $this->respondWithSuccess(
             $this->serializer->normalize($user, 'null', ['groups' => ['api_v1_users', 'api_v1_users_read']])
@@ -249,9 +250,9 @@ class UserController extends ApiController
     public function update(ImageUploader $imageUploader,Request $request, User $user, ObjectNormalizer $objetNormalizer)
     {
 
-        /* if ($this->getUser()->getId() !== $user->getId()) {
+        if ($this->getUser()->getId() !== $user->getId()) {
             return $this->respondUnauthorized("t'as rien à faire là dude !");
-        } */
+        } 
 
         $form = $this->createForm(UserType::class, $user, ['csrf_protection' => false]);
 
@@ -270,8 +271,9 @@ class UserController extends ApiController
             $manager = $this->getDoctrine()->getManager();
             if ($imageFile) {
                $fileName = $imageUploader->avatarFile($imageFile, 'images');
+               $user->setAvatar($fileName);
             }
-            $user->setAvatar($fileName);
+           
             $manager->flush();
 
             $userJson = $this->serializer->normalize($user, null, ['groups' => 'api_v1_users']);
@@ -322,7 +324,7 @@ class UserController extends ApiController
      * @Route("/{id}/banned", name="banned",methods={"GET","POST"})
      * @IsGranted("ROLE_ADMIN")
      */
-
+    
     // For V2 
     public function banned($id)
     {
