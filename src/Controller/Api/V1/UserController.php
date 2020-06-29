@@ -50,7 +50,7 @@ class UserController extends ApiController
 
         // check if the user is the one who sends friend's request
         if ($this->getUser()->getId() !== $user->getId()) {
-            return $this->respondUnauthorized("t'as rien à faire là mon pote");
+            return $this->respondUnauthorized("t'as rien à faire là dude !");
         }
 
         $friendship = $this->getDoctrine()->getRepository(UserFriends::class)->getFriendship($user, $idFriend);
@@ -85,7 +85,7 @@ class UserController extends ApiController
     {
         // check if the user is the one who requests friend's request
         if ($this->getUser()->getId() !== $user->getId()) {
-            return $this->respondUnauthorized("t'as rien à faire là mon pote");
+            return $this->respondUnauthorized("t'as rien à faire là dude !");
         }
 
         $friend = $this->getDoctrine()->getRepository(User::class)->find($idFriend);
@@ -148,7 +148,7 @@ class UserController extends ApiController
 
         // check if the user is the one who sends the unfriend  
         if ($this->getUser()->getId() !== $user->getId()) {
-            return $this->respondUnauthorized("t'as rien à faire là mon pote");
+            return $this->respondUnauthorized("t'as rien à faire là dude !");
         }
 
         $friendship = $this->getDoctrine()->getRepository(UserFriends::class)->getFriendship($user, $idFriend);
@@ -181,7 +181,7 @@ class UserController extends ApiController
     /**
      *
      * @Route("/", name="list")
-     *
+     * 
      */
     public function list(UserRepository $userRepository)
     {
@@ -190,7 +190,9 @@ class UserController extends ApiController
         return $this->json($json);
     }
 
+
     /**
+     * 
      * @Route("/{id}", name="read", methods={"GET"})
      * 
      */
@@ -206,7 +208,7 @@ class UserController extends ApiController
     }
 
     /**
-     * @Route("/{id}/friends", name="read", methods={"GET"})
+     * @Route("/{id}/friends", name="seeFriends", methods={"GET"})
      * 
      */
     public function seeFriends(int $id, Request $request, UserRepository $userRepository)
@@ -292,7 +294,7 @@ class UserController extends ApiController
 
 
     /**
-     * @Route("/{id}", name="delete", methods={"DELETE"})
+     * @Route("/{id}/delete", name="delete", methods={"DELETE"})
      * 
      */
     public function delete($id)
@@ -306,7 +308,7 @@ class UserController extends ApiController
         // je demande au manager d'executer dans la BDD toute les modifications qui ont été faites sur les entités
         $manager->flush();
         return $this->respondWithSuccess([
-            'message' => 'Votre compte a bien supprimé',
+            'message' => 'Votre compte a bien été supprimé',
         ]);
     }
 

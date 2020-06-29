@@ -39,8 +39,6 @@ class UserController extends AbstractController
      */
     public function indexAdmin(UserRepository $userRepository): Response
     {
-
-
         return $this->render('admin/index.html.twig', [
             'users' => $userRepository->findAll(),
         ]);
@@ -56,7 +54,6 @@ class UserController extends AbstractController
             'user' => $user,
         ]);
     }
-
 
 
     /**
@@ -114,9 +111,6 @@ class UserController extends AbstractController
         return $this->redirectToRoute('user_index');
     }
 
-    
-
-    
 
     /**
      * @Route("/{id}/edit", name="user_edit", methods={"GET","POST"})
