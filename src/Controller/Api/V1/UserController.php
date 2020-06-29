@@ -214,7 +214,7 @@ class UserController extends ApiController
     public function seeFriends(int $id, Request $request, UserRepository $userRepository)
     {
 
-        
+
         $user = $userRepository->getFullUser($id);
         return $this->respondWithSuccess(
             $this->serializer->normalize($user, 'null', ['groups' => ['friends']])
@@ -297,15 +297,17 @@ class UserController extends ApiController
      * @Route("/{id}/delete", name="delete", methods={"DELETE"})
      * 
      */
-    public function delete($id)
+    public function delete(User $user)
     {
-        // je recupère mon entité
-        $user = $this->getDoctrine()->getRepository(User::class)->find($id);
-        // je demande le manager
+
+
+        // check if the user is the one who requests friend's request
+        if ($this->getUser()->getId() !== $user->getId()) {
+            return $this->respondUnauthorized("t'as rien à faire là dude !");
+        }
+
         $manager = $this->getDoctrine()->getManager();
-        // je dit au manager que cette entité devra faire l'objet d'une suppression
         $manager->remove($user);
-        // je demande au manager d'executer dans la BDD toute les modifications qui ont été faites sur les entités
         $manager->flush();
         return $this->respondWithSuccess([
             'message' => 'Votre compte a bien été supprimé',
