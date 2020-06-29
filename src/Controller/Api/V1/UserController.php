@@ -50,15 +50,14 @@ class UserController extends ApiController
 
         // check if the user is the one who sends friend's request
         if ($this->getUser()->getId() !== $user->getId()) {
-            return $this->respondUnauthorized("t'as rien à faire là mon pote");
+            return $this->respondUnauthorized("t'as rien à faire là dude !");
         }
 
-        $friend = $this->getDoctrine()->getRepository(User::class)->find($idFriend);
         $friendship = $this->getDoctrine()->getRepository(UserFriends::class)->getFriendship($user, $idFriend);
 
         //check if the relation does not exist yet 
         if ($friendship !== null) {
-            return $this->respondUnauthorized("Demande d'ami déja envoyé");
+            return $this->respondUnauthorized("Demande d'ami déja envoyée");
         }
         $friend = $this->getDoctrine()->getRepository(User::class)->find($idFriend);
         $manager = $this->getDoctrine()->getManager();
@@ -70,10 +69,9 @@ class UserController extends ApiController
         $addNewRelation->setIsAccepted(false);
         $addNewRelation->setIsAnswered(false);
         $manager->persist($addNewRelation);
-
         $manager->flush();
         return $this->respondCreated([
-            'message' => sprintf('demande d\'ami envoyée a %s ', $friend->getUsername())
+            'message' => sprintf('demande d\'ami envoyée à %s ', $friend->getUsername())
         ]);
     }
 
@@ -87,7 +85,7 @@ class UserController extends ApiController
     {
         // check if the user is the one who requests friend's request
         if ($this->getUser()->getId() !== $user->getId()) {
-            return $this->respondUnauthorized("t'as rien à faire là mon pote");
+            return $this->respondUnauthorized("t'as rien à faire là dude !");
         }
 
         $friend = $this->getDoctrine()->getRepository(User::class)->find($idFriend);
@@ -103,7 +101,7 @@ class UserController extends ApiController
 
 
         if ($friendshipReverse !== null) {
-            return $this->respondUnauthorized("Vous avez déjà répondu à cette invitation à");
+            return $this->respondUnauthorized("Vous avez déjà répondu à cette invitation");
         };
         //add second lign for same relationship 
         $addNewRelation = new UserFriends;
@@ -128,7 +126,7 @@ class UserController extends ApiController
 
         if ($bool == 1) {
             return $this->respondCreated([
-                'message' => sprintf('vous êtes désormais amis avec %s', $friendUsername)
+                'message' => sprintf('vous êtes désormais ami(e) avec %s', $friendUsername)
             ], 201);
         } else {
             return $this->respondCreated([
@@ -140,7 +138,7 @@ class UserController extends ApiController
 
     /**
      *
-     * add friends 
+     * 
      * @Route("/{id}/unfriend/{idFriend}", requirements={"id" = "\d+","id2" = "\d+"}, name="unfriend")
      * 
      */
@@ -148,9 +146,9 @@ class UserController extends ApiController
     {
 
 
-        // check if the user is the one who sends the unfriend 
+        // check if the user is the one who sends the unfriend  
         if ($this->getUser()->getId() !== $user->getId()) {
-            return $this->respondUnauthorized("t'as rien à faire là mon pote");
+            return $this->respondUnauthorized("t'as rien à faire là dude !");
         }
 
         $friendship = $this->getDoctrine()->getRepository(UserFriends::class)->getFriendship($user, $idFriend);
@@ -159,24 +157,31 @@ class UserController extends ApiController
         if ($friendship === null) {
             return $this->respondUnauthorized("Cette relation n'existe pas");
         };
+
+
         //dd($friendship,$friendshipReverse);
         $manager = $this->getDoctrine()->getManager();
         $manager->remove($friendship);
-        $manager->remove($friendshipReverse);
+        if ($friendshipReverse !== null) {
+            $manager->remove($friendshipReverse);
+        }
         $manager->flush();
 
         $friend = $this->getDoctrine()->getRepository(User::class)->find($idFriend);
 
         return $this->respondCreated([
-            'message' => sprintf('Vous avez supprimé %s de votre liste d\'ami', $friend->getUsername())
+            'message' => sprintf('Vous avez supprimé %s de votre liste d\'amis', $friend->getUsername())
         ], 201);
     }
+
+
+
 
 
     /**
      *
      * @Route("/", name="list")
-     *
+     * 
      */
     public function list(UserRepository $userRepository)
     {
@@ -185,7 +190,9 @@ class UserController extends ApiController
         return $this->json($json);
     }
 
+
     /**
+     * 
      * @Route("/{id}", name="read", methods={"GET"})
      * 
      */
@@ -199,6 +206,33 @@ class UserController extends ApiController
             $this->serializer->normalize($user, 'null', ['groups' => ['api_v1_users', 'api_v1_users_read']])
         );
     }
+
+    /**
+     * @Route("/{id}/friends", name="friendsList", methods={"GET"})
+     * 
+     */
+    public function friendsList(int $id, Request $request, UserRepository $userRepository)
+    {
+
+
+        $user = $userRepository->getFullUser($id);
+        return $this->respondWithSuccess(
+            $this->serializer->normalize($user, 'null', ['groups' => ['friends']])
+        );
+    }
+
+/**
+     * @Route("/{id}/achievements", name="achievementsList", methods={"GET"})
+     * 
+     */
+    public function achievementsList(User $user, Request $request, UserRepository $userRepository)
+    {
+
+        return $this->respondWithSuccess(
+            $this->serializer->normalize($user, 'null', ['groups' => 'achievements'])
+        );
+    }
+
 
     /**
      * @Route("", name="add", methods={"POST"})
@@ -272,21 +306,23 @@ class UserController extends ApiController
 
 
     /**
-     * @Route("/{id}", name="delete", methods={"DELETE"})
+     * @Route("/{id}/delete", name="delete", methods={"DELETE"})
      * 
      */
-    public function delete($id)
+    public function delete(User $user)
     {
-        // je recupère mon entité
-        $user = $this->getDoctrine()->getRepository(User::class)->find($id);
-        // je demande le manager
+
+
+        // check if the user is the one who requests friend's request
+        if ($this->getUser()->getId() !== $user->getId()) {
+            return $this->respondUnauthorized("t'as rien à faire là dude !");
+        }
+
         $manager = $this->getDoctrine()->getManager();
-        // je dit au manager que cette entité devra faire l'objet d'une suppression
         $manager->remove($user);
-        // je demande au manager d'executer dans la BDD toute les modifications qui ont été faites sur les entités
         $manager->flush();
         return $this->respondWithSuccess([
-            'message' => 'Votre compte a bien supprimé',
+            'message' => 'Votre compte a bien été supprimé',
         ]);
     }
 
