@@ -208,7 +208,7 @@ class UserController extends ApiController
     }
 
     /**
-     * @Route("/{id}/friends", name="seeFriends", methods={"GET"})
+     * @Route("/{id}/friends", name="friendsList", methods={"GET"})
      * 
      */
     public function friendsList(int $id, Request $request, UserRepository $userRepository)
@@ -221,7 +221,17 @@ class UserController extends ApiController
         );
     }
 
+/**
+     * @Route("/{id}/achievements", name="achievementsList", methods={"GET"})
+     * 
+     */
+    public function achievementsList(User $user, Request $request, UserRepository $userRepository)
+    {
 
+        return $this->respondWithSuccess(
+            $this->serializer->normalize($user, 'null', ['groups' => 'achievements'])
+        );
+    }
 
 
     /**
