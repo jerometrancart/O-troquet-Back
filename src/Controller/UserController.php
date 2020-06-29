@@ -39,8 +39,6 @@ class UserController extends AbstractController
      */
     public function indexAdmin(UserRepository $userRepository): Response
     {
-
-
         return $this->render('admin/index.html.twig', [
             'users' => $userRepository->findAll(),
         ]);
@@ -56,7 +54,6 @@ class UserController extends AbstractController
             'user' => $user,
         ]);
     }
-
 
 
     /**
@@ -87,19 +84,7 @@ class UserController extends AbstractController
         $manager->flush();
         $to = $user->getEmail();
 
-
-        /*
-                $email = (new TemplatedEmail())
-                ->from('essaiphpmailer@gmail.com')
-                ->to($user->getEmail())
-                ->subject('O\'troquet ')
-                ->text('Sending emails is fun again!')
-                ->htmlTemplate('user/banned.html.twig')
-                ->context([
-                        'username' => $user,
-                    ]);
-
-                $mailer->send($email); */
+        
         $mailerService->sendToken($token = [], $to, $user,$tokenLifeTime = [],'Compte banni','user/banned.html.twig');
 
 
@@ -126,9 +111,6 @@ class UserController extends AbstractController
         return $this->redirectToRoute('user_index');
     }
 
-    
-
-    
 
     /**
      * @Route("/{id}/edit", name="user_edit", methods={"GET","POST"})
