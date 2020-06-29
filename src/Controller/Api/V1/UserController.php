@@ -209,12 +209,11 @@ class UserController extends ApiController
      * @Route("/{id}/friends", name="read", methods={"GET"})
      * 
      */
-    public function SeeFriends(int $id, Request $request, UserRepository $userRepository)
+    public function seeFriends(int $id, Request $request, UserRepository $userRepository)
     {
 
+        
         $user = $userRepository->getFullUser($id);
-
-
         return $this->respondWithSuccess(
             $this->serializer->normalize($user, 'null', ['groups' => ['friends']])
         );
