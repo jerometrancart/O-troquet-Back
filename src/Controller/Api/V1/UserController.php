@@ -221,7 +221,7 @@ class UserController extends ApiController
         );
     }
 
-/**
+    /**
      * @Route("/{id}/achievements", name="achievementsList", methods={"GET"})
      * 
      */
@@ -247,25 +247,24 @@ class UserController extends ApiController
 
         if ($form->isValid()) {
 
+            dd($user);
             $user->setPassword($this->encoder->encodePassword($user, $user->getPassword()));
             $em = $this->getDoctrine()->getManager();
             $em->persist($user);
             $em->flush();
 
-            $serializer = new Serializer([$objetNormalizer]);
-            $userJson = $serializer->normalize($user, null, ['groups' => 'api_v1_users']);
+            $userJson = $this->serializer->normalize($user, null, ['groups' => 'api_v1_users']);
 
-            return $this->json($userJson, 201);
+            return $this->respondWithSuccess($userJson);
         } else {
-            ($form->getErrors(true));
-            return $this->respondWithErrors((string) $form->getErrors(true), 400);
+            return $this->json((string) $form->getErrors(true), 400);
         }
     }
 
 
     /**
      * @Route("/{id}/update", name="update",  methods={"GET","POST"})
-     * 
+     * @IsGranted("ROLE_ADMIN")
      */
     public function update(Request $request, User $user, ObjectNormalizer $objetNormalizer)
     {
@@ -281,16 +280,15 @@ class UserController extends ApiController
             $user->setPassword($this->encoder->encodePassword($user, $user->getPassword()));
             $manager = $this->getDoctrine()->getManager();
 
-
             $manager->flush();
-            $serializer = new Serializer([$objetNormalizer]);
-            $userJson = $serializer->normalize($user, null, ['groups' => 'api_v1_users']);
-            return $this->respondWithSuccess($userJson, 201);
+           
+            $userJson = $this->serializer->normalize($user, null, ['groups' => 'api_v1_users']);
+            return $this->respondWithSuccess($userJson);
+
         } else {
 
-            ($form->getErrors(true));
+            return $this->json((string) $form->getErrors(true), 400);
 
-            return $this->respondWithErrors((string) $form->getErrors(true), 400);
         }
     }
 
@@ -317,7 +315,6 @@ class UserController extends ApiController
         if ($this->getUser()->getId() !== $user->getId()) {
             return $this->respondUnauthorized("t'as rien à faire là dude !");
         }
-
         $manager = $this->getDoctrine()->getManager();
         $manager->remove($user);
         $manager->flush();
@@ -327,10 +324,11 @@ class UserController extends ApiController
     }
 
 
-    /**
+    /*
      * @Route("/{id}/banned", name="banned",methods={"GET","POST"})
      * @IsGranted("ROLE_ADMIN")
      */
+
     // For V2 
     public function banned($id)
     {
