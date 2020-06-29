@@ -87,19 +87,7 @@ class UserController extends AbstractController
         $manager->flush();
         $to = $user->getEmail();
 
-
-        /*
-                $email = (new TemplatedEmail())
-                ->from('essaiphpmailer@gmail.com')
-                ->to($user->getEmail())
-                ->subject('O\'troquet ')
-                ->text('Sending emails is fun again!')
-                ->htmlTemplate('user/banned.html.twig')
-                ->context([
-                        'username' => $user,
-                    ]);
-
-                $mailer->send($email); */
+        
         $mailerService->sendToken($token = [], $to, $user,$tokenLifeTime = [],'Compte banni','user/banned.html.twig');
 
 

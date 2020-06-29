@@ -37,13 +37,13 @@ class UserFriends
    
     /**
      * @ORM\Column(type="boolean")
-     * @Groups({"api_v1_users"})
+     * @Groups({"api_v1_users","friends"})
      */
     private $isAccepted;
 
     /**
      * @ORM\Column(type="boolean")
-     * @Groups({"api_v1_users"})
+     * @Groups({"api_v1_users","friends"})
      */
     private $isAnswered;
 
@@ -92,7 +92,7 @@ class UserFriends
     
 
     /**
-     * @Groups({"api_v1_users"})
+     * @Groups({"api_v1_users","friends"})
      */
     public function getFriendDetails()
     {

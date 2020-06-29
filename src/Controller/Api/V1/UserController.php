@@ -138,7 +138,7 @@ class UserController extends ApiController
 
     /**
      *
-     * add friends 
+     * 
      * @Route("/{id}/unfriend/{idFriend}", requirements={"id" = "\d+","id2" = "\d+"}, name="unfriend")
      * 
      */
@@ -204,6 +204,22 @@ class UserController extends ApiController
             $this->serializer->normalize($user, 'null', ['groups' => ['api_v1_users', 'api_v1_users_read']])
         );
     }
+
+    /**
+     * @Route("/{id}/friends", name="read", methods={"GET"})
+     * 
+     */
+    public function SeeFriends(int $id, Request $request, UserRepository $userRepository)
+    {
+
+        $user = $userRepository->getFullUser($id);
+
+
+        return $this->respondWithSuccess(
+            $this->serializer->normalize($user, 'null', ['groups' => ['friends']])
+        );
+    }
+
 
     /**
      * @Route("", name="add", methods={"POST"})
