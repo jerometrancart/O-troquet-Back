@@ -32,7 +32,7 @@ class User implements UserInterface
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups({"api_v1_users","api_v1_users_stat"})
+     * @Groups({"api_v1_users","api_v1_users_stat","achievements"})
      */
     private $id;
 
@@ -53,7 +53,7 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", length=64)
-     * @Groups({"api_v1_users","friends"})
+     * @Groups({"api_v1_users","friends","achievements"})
      * @Groups({"api_v1_users_stat"})
      * @MaxDepth(4)
      */
@@ -108,7 +108,7 @@ class User implements UserInterface
 
     /**
      * @ORM\ManyToMany(targetEntity=Achievement::class, mappedBy="hadUsers")
-     * @Groups({"api_v1_users_read"})
+     * @Groups({"api_v1_users_read","achievements"})
      *
      */
     private $achievements;

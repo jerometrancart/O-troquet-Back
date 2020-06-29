@@ -211,7 +211,7 @@ class UserController extends ApiController
      * @Route("/{id}/friends", name="seeFriends", methods={"GET"})
      * 
      */
-    public function seeFriends(int $id, Request $request, UserRepository $userRepository)
+    public function friendsList(int $id, Request $request, UserRepository $userRepository)
     {
 
 
@@ -220,6 +220,8 @@ class UserController extends ApiController
             $this->serializer->normalize($user, 'null', ['groups' => ['friends']])
         );
     }
+
+
 
 
     /**
