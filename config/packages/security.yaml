@@ -41,7 +41,6 @@ security:
                 authenticators:
                     - App\Security\LoginFormAuthenticator
 
-
             # activate different ways to authenticate
 
             # http_basic: true

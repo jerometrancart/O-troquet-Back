@@ -37,7 +37,6 @@ class UserController extends ApiController
         $this->encoder = $encoder;
     }
 
-
     /**
      *
      * add friends 
@@ -46,10 +45,15 @@ class UserController extends ApiController
      */
     public function friendRequest(User $user, $idFriend)
     {
-        // check if the user is the one who sends friend's request
+        $this->denyAccessUnlessGranted('onlyuser', $user);
+
+
+       /*  // check if the user is the one who sends friend's request
         if ($this->getUser()->getId() !== $user->getId()) {
             return $this->respondUnauthorized("t'as rien à faire là dude !");
-        }
+        } */
+
+
         $friendship = $this->getDoctrine()->getRepository(UserFriends::class)->getFriendship($user, $idFriend);
         //check if the relation does not exist yet 
         if ($friendship !== null) {
@@ -79,10 +83,13 @@ class UserController extends ApiController
      */
     public function friendResponse(User $user, $idFriend, $bool)
     {
-        // check if the user is the one who requests friend's request
+        /* // check if the user is the one who requests friend's request
         if ($this->getUser()->getId() !== $user->getId()) {
             return $this->respondUnauthorized("t'as rien à faire là dude !");
-        }
+        } */
+
+       $this->denyAccessUnlessGranted('onlyuser', $user);
+
 
         $friend = $this->getDoctrine()->getRepository(User::class)->find($idFriend);
         $friendship = $this->getDoctrine()->getRepository(UserFriends::class)->getFriendship($idFriend, $user);
@@ -127,8 +134,6 @@ class UserController extends ApiController
             ], 201);
         }
     }
-
-
     /**
      *
      * 
@@ -137,11 +142,12 @@ class UserController extends ApiController
      */
     public function unfriend(User $user, $idFriend)
     {
-
+      
+        $this->denyAccessUnlessGranted('onlyuser', $user);
         // check if the user is the one who sends the unfriend  
-        if ($this->getUser()->getId() !== $user->getId()) {
+       /*  if ($this->getUser()->getId() !== $user->getId()) {
             return $this->respondUnauthorized("t'as rien à faire là dude !");
-        }
+        } */
 
         $friendship = $this->getDoctrine()->getRepository(UserFriends::class)->getFriendship($user, $idFriend);
         $friendshipReverse = $this->getDoctrine()->getRepository(UserFriends::class)->getFriendship($idFriend, $user);
@@ -182,9 +188,8 @@ class UserController extends ApiController
      */
     public function read(int $id, Request $request, UserRepository $userRepository)
     {
-
-
         $user = $userRepository->getFullUser($id);
+        
         return $this->respondWithSuccess(
             $this->serializer->normalize($user, 'null', ['groups' => ['api_v1_users', 'api_v1_users_read']])
         );
@@ -250,9 +255,12 @@ class UserController extends ApiController
     public function update(ImageUploader $imageUploader,Request $request, User $user, ObjectNormalizer $objetNormalizer)
     {
 
-        if ($this->getUser()->getId() !== $user->getId()) {
+        $this->denyAccessUnlessGranted('edit', $user);
+
+      /*   if ($this->getUser()->getId() !== $user->getId()) {
             return $this->respondUnauthorized("t'as rien à faire là dude !");
         } 
+ */         
 
         $form = $this->createForm(UserType::class, $user, ['csrf_protection' => false]);
 
@@ -298,10 +306,12 @@ class UserController extends ApiController
      */
     public function delete(User $user)
     {
+
+        $this->denyAccessUnlessGranted('edit', $user);
         // check if the user is the one who requests friend's request
-        if ($this->getUser()->getId() !== $user->getId()) {
+     /*    if ($this->getUser()->getId() !== $user->getId()) {
             return $this->respondUnauthorized("t'as rien à faire là dude !");
-        }
+        } */
         $manager = $this->getDoctrine()->getManager();
         $manager->remove($user);
         $manager->flush();
@@ -309,14 +319,6 @@ class UserController extends ApiController
             'message' => 'Votre compte a bien été supprimé',
         ]);
     }
-
-    /*   {
-    "username": "jerrrrrerrreerreeeodme",
-    "email":"jeeeerorrrrrmerre@gddmailrr.com",
-    "password":"boeeeerrebkor3!",
-    "roles": ["ROLE_ADMIN"],
-    "avatar": "123.jpg"
-} */
 
     /*
      * @Route("/{id}/banned", name="banned",methods={"GET","POST"})
