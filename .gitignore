@@ -21,3 +21,7 @@
 ###> mercure ###
 updates.db
 ###< mercure ###
+
+###> upload avatar###
+public/uploads/avatars
+###< upload avatar###
