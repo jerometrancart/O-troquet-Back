@@ -256,8 +256,6 @@ class UserController extends ApiController
 
         $form = $this->createForm(UserType::class, $user, ['csrf_protection' => false]);
 
-      
-
         // L'option true (deuxième argument de json_decode(), permet de spécifier qu'on veut un arra yet pas un objet)
         //$json = json_decode($request->getContent(), true);
         $json = json_decode($request->get('json'), true);

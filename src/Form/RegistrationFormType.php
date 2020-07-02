@@ -13,7 +13,7 @@ use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Email;
-
+use Symfony\Component\Validator\Constraints\Regex;
 
 class RegistrationFormType extends AbstractType
 {
@@ -21,7 +21,12 @@ class RegistrationFormType extends AbstractType
     {
         $builder
             ->add('username', null, [
-                'constraints' => new NotBlank,
+                'constraints' => [
+                new NotBlank ([
+                    'message' => 'Please enter a username'
+                ]),
+                //new Regex('^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$^')
+                ]
             ])
             ->add('email', EmailType::class, [
                 'constraints' => [

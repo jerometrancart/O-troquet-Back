@@ -15,3 +15,4 @@ class DefaultController extends AbstractController
         return $this->render('homepage.html.twig');
     }
 }
+

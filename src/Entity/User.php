@@ -46,8 +46,9 @@ class User implements UserInterface
     /**
      * @ORM\Column(type="string", length=255)
      * 
-     * * @Assert\NotBlank(message="New password can not be blank.")
-     *  @Assert\Regex(pattern="/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/i", message="New password is required to be minimum 6 chars in length and to include at least one letter and one number and one special character.")
+     *@Assert\NotBlank(message="New password can not be blank.")
+     * @Assert\Regex(pattern="/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/i",
+     *  message="New password is required to be minimum 6 chars in length and to include at least one letter and one number and one special character.")
      */
     private $password;
 
@@ -55,7 +56,8 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=64)
      * @Groups({"api_v1_users","friends","achievements"})
      * @Groups({"api_v1_users_stat"})
-     * @MaxDepth(4)
+     * @Assert\Regex(pattern="/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/i",
+     *  message="New passwodopord is required to be minimum 6 chars in length and to include at least one letter and one number and one special character.")
      */
     private $username;
 
