@@ -1,7 +1,6 @@
 
 nelmio_cors:
-    defaults:
-        #allow_credentials: true
+    defaults:        
         origin_regex: true
         allow_credentials: true
         allow_origin: ['*']
@@ -11,7 +10,6 @@ nelmio_cors:
         max_age: 3600
     paths:
         '^/login':
-            #allow_credentials: true
             origin_regex: true
             allow_credentials: true
             allow_origin: ['*']
@@ -24,8 +22,6 @@ nelmio_cors:
             allow_headers: ['*']
             allow_methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE']
             max_age: 3600
-
-
 # /* // Add headers for CORS
 # header('Access-Control-Allow-Origin: http://localhost:8080');
 # header('Access-Control-Allow-Credentials: true ');

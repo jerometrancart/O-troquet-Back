@@ -56,8 +56,7 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=64)
      * @Groups({"api_v1_users","friends","achievements"})
      * @Groups({"api_v1_users_stat"})
-     * @Assert\Regex(pattern="/^(?=.{8,20}$)(?![_.])(?!.*[_.]{2})[a-zA-Z0-9._]+(?<![_.])$/i",
-     *  message="New passwodopord is required to be minimum 6 chars in length and to include at least one letter and one number and one special character.")
+     * 
      */
     private $username;
 
