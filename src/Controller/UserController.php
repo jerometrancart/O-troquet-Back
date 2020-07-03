@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Service\ImageUploader;
 use App\Service\MailerService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -73,14 +74,14 @@ class UserController extends AbstractController
     {
 
         $mailerService = new MailerService($mailer);
-        // je recupère mon entité
+        // I get my entity back
         $user = $this->getDoctrine()->getRepository(User::class)->find($user);
-        // je demande le manager
+        // I'm asking for the manager.
         $manager = $this->getDoctrine()->getManager();
 
         $user->setIsBanned(true);
 
-        // je demande au manager d'executer dans la BDD toute les modifications qui ont été faites sur les entités
+        // I ask the manager to execute in the DB all the modifications that have been made on the entire database.tés
         $manager->flush();
         $to = $user->getEmail();
 
@@ -99,13 +100,13 @@ class UserController extends AbstractController
      */
     public function unbanned($id)
     {
-        // je recupère mon entité
+        // I get my entity back
         $user = $this->getDoctrine()->getRepository(User::class)->find($id);
-        // je demande le manager
+        // I'm asking for the manager
         $manager = $this->getDoctrine()->getManager();
 
         $user->setIsBanned(false);
-        // je demande au manager d'executer dans la BDD toute les modifications qui ont été faites sur les entités
+        // I ask the manager to execute in the database all the modifications that have been made on the entitie
         $manager->flush();
 
         return $this->redirectToRoute('user_index');
@@ -122,25 +123,25 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // On vérifie si le champs password contient une valeur
-            // On récupère la valeur de ce champs
+            // We check if the password field contains a va
+            // We retrieve the value of this field
 
             $password = $form->get('password')->getData();
 
-            // Si rien n'a été tapé dans le champs password, on reçoit las valeur null
-            // Si $password est différent de null, on modifie le mot de passe de $user
+            // If nothing has been typed in the password field, we get the null valu
+            // If $password is different from null, we change the password of $user
             if ($password != null) {
                 $encodedPassword = $passwordEncoder->encodePassword($user, $password);
                 $user->setPassword($encodedPassword);
             }
 
-            /** @var UploadedFile avatar */
+            /** @var ImageUploader avatar */
             $avatar = $form->get('avatar')->getData();
             if ($avatar) {
                 $filename = uniqid() . '.' . $avatar->guessExtension();
 
                 $avatar->move(
-                    $this->getParameter('images_directory'),
+                    $this->getParameter('avatar_directory'),
                     $filename
                 );
 

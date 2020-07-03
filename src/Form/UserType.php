@@ -39,10 +39,11 @@ class UserType extends AbstractType
                     'multiple' => true,
                     'expanded' => true,
                 ])
-            ->add('avatar', FileType::class, [
-                'label' => 'Avatar',
-                'mapped' => false,
-                'required' => false,
+
+            /* ->add('avatar', FileType::class, [
+                'label' => 'avatar',
+                'mapped' => true,
+                'required' => true,
                 'constraints' => [
                     new File([
                         'maxSize' => '536k',
@@ -53,7 +54,7 @@ class UserType extends AbstractType
                         'mimeTypesMessage' => 'Please upload a valid PDF document',
                     ])
                 ],
-            ])
+            ]) */
             ->add('email', EmailType::class, [
                 'constraints' => [
                     new Email,

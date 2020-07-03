@@ -29,7 +29,6 @@ class AchievementController extends AbstractController
         ]);
     }
 
-
     /**
      *
      * @Route("/{id}/view", name="achievement_view", requirements={"id" = "\d+"}, methods={"GET"})

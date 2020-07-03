@@ -9,6 +9,7 @@ use App\Form\UserType;
 use App\Repository\UserRepository;
 use App\Repository\PlayRepository;
 use App\Repository\UserFriendsRepository;
+use App\Service\ImageUploader;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Doctrine\Persistence\ObjectManager;
@@ -20,7 +21,6 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
-
 
 /**
  * @Route("/api/v1/users", name="api_v1_user_")
@@ -38,7 +38,6 @@ class UserController extends ApiController
     }
 
 
-
     /**
      *
      * add friends 
@@ -47,14 +46,11 @@ class UserController extends ApiController
      */
     public function friendRequest(User $user, $idFriend)
     {
-
         // check if the user is the one who sends friend's request
         if ($this->getUser()->getId() !== $user->getId()) {
             return $this->respondUnauthorized("t'as rien à faire là dude !");
         }
-
         $friendship = $this->getDoctrine()->getRepository(UserFriends::class)->getFriendship($user, $idFriend);
-
         //check if the relation does not exist yet 
         if ($friendship !== null) {
             return $this->respondUnauthorized("Demande d'ami déja envoyée");
@@ -98,11 +94,10 @@ class UserController extends ApiController
 
         //check if the second relation ($friend -> $user ) does not exist
         $friendshipReverse = $this->getDoctrine()->getRepository(UserFriends::class)->getFriendship($user, $idFriend);
-
-
         if ($friendshipReverse !== null) {
             return $this->respondUnauthorized("Vous avez déjà répondu à cette invitation");
         };
+
         //add second lign for same relationship 
         $addNewRelation = new UserFriends;
         $addNewRelation->setUser($user);
@@ -121,9 +116,7 @@ class UserController extends ApiController
         $manager = $this->getDoctrine()->getManager();
         $manager->persist($addNewRelation, $friendship);
         $manager->flush();
-
         $friendUsername =  $friend->getUsername();
-
         if ($bool == 1) {
             return $this->respondCreated([
                 'message' => sprintf('vous êtes désormais ami(e) avec %s', $friendUsername)
@@ -145,7 +138,6 @@ class UserController extends ApiController
     public function unfriend(User $user, $idFriend)
     {
 
-
         // check if the user is the one who sends the unfriend  
         if ($this->getUser()->getId() !== $user->getId()) {
             return $this->respondUnauthorized("t'as rien à faire là dude !");
@@ -159,7 +151,6 @@ class UserController extends ApiController
         };
 
 
-        //dd($friendship,$friendshipReverse);
         $manager = $this->getDoctrine()->getManager();
         $manager->remove($friendship);
         if ($friendshipReverse !== null) {
@@ -174,14 +165,8 @@ class UserController extends ApiController
         ], 201);
     }
 
-
-
-
-
     /**
-     *
      * @Route("/", name="list")
-     * 
      */
     public function list(UserRepository $userRepository)
     {
@@ -189,7 +174,6 @@ class UserController extends ApiController
         $json = $this->serializer->normalize($users, null, ['groups' => 'api_v1_users']);
         return $this->json($json);
     }
-
 
     /**
      * 
@@ -199,9 +183,8 @@ class UserController extends ApiController
     public function read(int $id, Request $request, UserRepository $userRepository)
     {
 
+
         $user = $userRepository->getFullUser($id);
-
-
         return $this->respondWithSuccess(
             $this->serializer->normalize($user, 'null', ['groups' => ['api_v1_users', 'api_v1_users_read']])
         );
@@ -213,7 +196,6 @@ class UserController extends ApiController
      */
     public function friendsList(int $id, Request $request, UserRepository $userRepository)
     {
-
 
         $user = $userRepository->getFullUser($id);
         return $this->respondWithSuccess(
@@ -232,7 +214,6 @@ class UserController extends ApiController
             $this->serializer->normalize($user, 'null', ['groups' => 'achievements'])
         );
     }
-
 
     /**
      * @Route("", name="add", methods={"POST"})
@@ -264,31 +245,42 @@ class UserController extends ApiController
 
     /**
      * @Route("/{id}/update", name="update",  methods={"GET","POST"})
-     * @IsGranted("ROLE_ADMIN")
+     * 
      */
-    public function update(Request $request, User $user, ObjectNormalizer $objetNormalizer)
+    public function update(ImageUploader $imageUploader,Request $request, User $user, ObjectNormalizer $objetNormalizer)
     {
+
+        if ($this->getUser()->getId() !== $user->getId()) {
+            return $this->respondUnauthorized("t'as rien à faire là dude !");
+        } 
 
         $form = $this->createForm(UserType::class, $user, ['csrf_protection' => false]);
 
-        // L'option true (deuxième argument de json_decode(), permet de spécifier qu'on veut un arra yet pas un objet)
-        $json = json_decode($request->getContent(), true);
+      
 
+        // L'option true (deuxième argument de json_decode(), permet de spécifier qu'on veut un arra yet pas un objet)
+        //$json = json_decode($request->getContent(), true);
+        $json = json_decode($request->get('json'), true);
+        $imageFile = $request->files->get('image');
+      
         // On simule l'envoi du formulaire
         $form->submit($json);
         if ($form->isValid()) {
+
             $user->setPassword($this->encoder->encodePassword($user, $user->getPassword()));
             $manager = $this->getDoctrine()->getManager();
-
-            $manager->flush();
+            if ($imageFile) {
+               $fileName = $imageUploader->avatarFile($imageFile, 'images');
+               $user->setAvatar($fileName);
+            }
            
+            $manager->flush();
+
             $userJson = $this->serializer->normalize($user, null, ['groups' => 'api_v1_users']);
+
             return $this->respondWithSuccess($userJson);
-
         } else {
-
             return $this->json((string) $form->getErrors(true), 400);
-
         }
     }
 
@@ -302,15 +294,12 @@ class UserController extends ApiController
         );
     }
 
-
     /**
      * @Route("/{id}/delete", name="delete", methods={"DELETE"})
      * 
      */
     public function delete(User $user)
     {
-
-
         // check if the user is the one who requests friend's request
         if ($this->getUser()->getId() !== $user->getId()) {
             return $this->respondUnauthorized("t'as rien à faire là dude !");
@@ -323,12 +312,19 @@ class UserController extends ApiController
         ]);
     }
 
+    /*   {
+    "username": "jerrrrrerrreerreeeodme",
+    "email":"jeeeerorrrrrmerre@gddmailrr.com",
+    "password":"boeeeerrebkor3!",
+    "roles": ["ROLE_ADMIN"],
+    "avatar": "123.jpg"
+} */
 
     /*
      * @Route("/{id}/banned", name="banned",methods={"GET","POST"})
      * @IsGranted("ROLE_ADMIN")
      */
-
+    
     // For V2 
     public function banned($id)
     {

@@ -10,13 +10,11 @@
     {{ form_start(form) }}
     {{ form_row(form.username) }}
     {{ form_row(form.email) }}
-    {{ form_row(form.avatar) }}
     {{ form_row(form.password) }}
     {{ form_row(form.roles) }}
     {% elseif "ROLE_ADMIN" in app.user.roles  %}
     {{ form_row(form.username) }}
     {{ form_row(form.email) }}
-    {{ form_row(form.avatar) }}
     {{ form_row(form.password) }}
     {{ form_row(form.roles) == false }}
     {% endif %}

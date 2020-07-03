@@ -79,21 +79,21 @@ class SecurityController extends AbstractController
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            // On vérifie si le champs password contient une valeur
-            // On récupère la valeur de ce champs
+            // We check if the password field contains a value
+            // We retrieve the value of this field
             $password = $form->get('password')->getData();
 
-            // Si rien n'a été tapé dans le champs password, on reçoit las valeur null
-            // Si $password est différent de null, on modifie le mot de passe de $user
-            //Permet d'enconder le mot de passe modifé
+            // If nothing has been typed in the password field, we get the null value.
+            // If $password is different from null, we change the password of $user
+            // Allows to embed the modified password
             if ($password != null) {
                 $encodedPassword = $passwordEncoder->encodePassword($user, $password);
                 $user->setPassword($encodedPassword);
                 $manager = $this->getDoctrine()->getManager();
-                // Pas besoin de persist, l'objet manipulé est déjà connu du manager
+                // No need to persist, the manipulated object is already known to the manager.
                 $manager->flush();
                 $this->addFlash("success", "Votre compte a été mise à jour");
-                //On se redirige vers la catégorie modifié
+                //We're redirecting to the modified category
                 return $this->redirectToRoute('homepage', ['id' => $user->getId()]);
             }
         }
@@ -106,8 +106,6 @@ class SecurityController extends AbstractController
     }
 
     /**
-     * Ici on demande en parametre de notre methode de controller un objet de type Category
-     * Catregory etant une entité, Doctrine va essayer d'utiliser les parametres de la route pour retrouver l'entité Category correspondant a l'id passé dans la route
      *
      * @Route("/{id}/view", name="security_view", requirements={"id" = "\d+"}, methods={"GET"})
      */
