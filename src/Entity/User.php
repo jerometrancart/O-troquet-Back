@@ -56,7 +56,6 @@ class User implements UserInterface
      * @ORM\Column(type="string", length=64)
      * @Groups({"api_v1_users","friends","achievements"})
      * @Groups({"api_v1_users_stat"})
-     * 
      */
     private $username;
 

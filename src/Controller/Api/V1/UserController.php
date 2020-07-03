@@ -123,6 +123,16 @@ class UserController extends ApiController
             $friendship->setIsAccepted(false);
             $addNewRelation->setIsAccepted(false);
         }
+        /*
+            $iSuccess = true;
+            if($bool != 1){
+                $iSuccess = false;
+            } 
+            $friendship->setIsAccepted($iSuccess);
+            $addNewRelation->setIsAccepted($iSuccess)
+        
+        
+        */
         //Get Manager
         $manager = $this->getDoctrine()->getManager();
         $manager->persist($addNewRelation, $friendship);
@@ -152,7 +162,7 @@ class UserController extends ApiController
         /*  if ($this->getUser()->getId() !== $user->getId()) {
             return $this->respondUnauthorized("t'as rien à faire là dude !");
         } */
-
+        $userFrienRepository =  $this->getDoctrine()->getRepository(UserFriends::class);
         $friendship = $this->getDoctrine()->getRepository(UserFriends::class)->getFriendship($user, $idFriend);
         $friendshipReverse = $this->getDoctrine()->getRepository(UserFriends::class)->getFriendship($idFriend, $user);
 
@@ -237,7 +247,6 @@ class UserController extends ApiController
 
         if ($form->isValid()) {
 
-            dd($user);
             $user->setPassword($this->encoder->encodePassword($user, $user->getPassword()));
             $em = $this->getDoctrine()->getManager();
             $em->persist($user);
@@ -259,6 +268,8 @@ class UserController extends ApiController
     public function update(ImageUploader $imageUploader, Request $request, User $user, ObjectNormalizer $objetNormalizer)
     {
 
+
+
         $this->denyAccessUnlessGranted('edit', $user);
 
         /*   if ($this->getUser()->getId() !== $user->getId()) {
@@ -273,16 +284,14 @@ class UserController extends ApiController
         $imageFile = $request->files->get('image');
 
         // On simule l'envoi du formulaire
-      $form->submit($json);
+        $form->submit($json);
         //dd($form->submit($json));
         if ($form->isValid()) {
-            dd('coucou');
 
             $user->setPassword($this->encoder->encodePassword($user, $user->getPassword()));
             $manager = $this->getDoctrine()->getManager();
-           
             $manager->flush();
-
+            //return $this->respondWithSuccess("cpicoi");
             $userJson = $this->serializer->normalize($user, null, ['groups' => 'api_v1_users']);
 
             return $this->respondWithSuccess($userJson);
@@ -298,18 +307,26 @@ class UserController extends ApiController
      * 
      * 
      */
-    public function updateAvatar(ImageUploader $imageUploader, Request $request, User $user, ObjectNormalizer $objetNormalizer,ValidatorInterface $validator )
+    public function updateAvatar(ImageUploader $imageUploader, Request $request, User $user, ObjectNormalizer $objetNormalizer, ValidatorInterface $validator)
     {
 
-
-
-
-      
-        /* 
+        /*  // dump($uploadedFile->gettype());
         $form = $this->createForm(UpdateAvatar::class, $user, ['csrf_protection' => false]);
-        $form->submit($uploadedFile);
-        dd($form); */
+        dump($form);
+        $form->handleRequest($request);
+        dd($form);
 
+        //dump($request);
+        //dump($uploadedFile);
+       
+        
+        $form->submit($uploadedFile);
+        dd($form['avatar']->getData());
+        dd($form);
+        dd($form->isValid()); 
+        */
+
+        // Validator for the uploaded file
         $uploadedFile = $request->files->get('avatar');
         $violations = $validator->validate(
             $uploadedFile,
@@ -320,30 +337,23 @@ class UserController extends ApiController
                 new File([
                     'maxSize' => '5M',
                     'mimeTypes' => [
-                        'image/gif',
-                        'image/jpg',
-                        'image/jpeg',
+                        'image/*',
                     ]
                 ])
             ]
         );
-        if ($violations->count() > 0) {
-            dd($violations);
 
+        if ($violations->count() > 0) {
             return $this->json($violations, 400);
         }
-
-          if ($uploadedFile) {
-               $fileName = $imageUploader->avatarFile($uploadedFile, 'images');
-               $user->setAvatar($fileName);
-            } 
-
-            $manager = $this->getDoctrine()->getManager();
-           
-            $manager->flush();
         
-            return $this->respondWithSuccess("c'est bon");
-
+        if ($uploadedFile) {
+            $fileName = $imageUploader->avatarFile($uploadedFile, 'images');
+            $user->setAvatar($fileName);
+        }
+        $manager = $this->getDoctrine()->getManager();
+        $manager->flush();
+        return $this->respondWithSuccess("c'est bon");
     }
 
 
