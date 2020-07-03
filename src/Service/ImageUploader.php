@@ -3,12 +3,10 @@
 namespace App\Service;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 class ImageUploader
 {
-
     private $targetDirectory;
     private $slugger;
 
@@ -18,31 +16,23 @@ class ImageUploader
         $this->slugger = $slugger;
     }
 
-
     public function getRandomFileName(string $extension): string
     {
-        return preg_replace('/[+=\/]/', random_int(0, 9), base64_encode(random_bytes(8))) . '.' . $extension;
+        return preg_replace('/[+=\/]/', random_int(0, 9), base64_encode(random_bytes(8))).'.'.$extension;
     }
 
     public function avatarFile(?UploadedFile $imageFile, string $targetDirectory): ?string
     {
         if ($imageFile != null) {
-            // Créons un nouveau nom de fichier
-            // On utilise un petit algorithme fait maison qui nous fait une chaine de caractère aléatoire
+            // Let's create a new filename
+            //  We use a little homemade algorithm that makes a random string of characters
             $filename = $this->getRandomFileName($imageFile->getClientOriginalExtension());
 
-            $imageFile->move($this->getTargetDirectory(), $filename);
+            $imageFile->move('images/'.$targetDirectory, $filename);
 
             return $filename;
         } else {
-
             return null;
         }
-    }
-
-
-    public function getTargetDirectory()
-    {
-        return $this->targetDirectory;
     }
 }
