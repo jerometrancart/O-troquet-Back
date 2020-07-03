@@ -5,6 +5,7 @@ namespace App\Controller\Api\V1;
 use App\Entity\Play;
 use App\Entity\User;
 use App\Entity\UserFriends;
+use App\Form\UpdateAvatar;
 use App\Form\UserType;
 use App\Repository\UserRepository;
 use App\Repository\PlayRepository;
@@ -21,6 +22,9 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
+use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @Route("/api/v1/users", name="api_v1_user_")
@@ -37,7 +41,6 @@ class UserController extends ApiController
         $this->encoder = $encoder;
     }
 
-
     /**
      *
      * add friends 
@@ -46,10 +49,15 @@ class UserController extends ApiController
      */
     public function friendRequest(User $user, $idFriend)
     {
-        // check if the user is the one who sends friend's request
+        $this->denyAccessUnlessGranted('onlyuser', $user);
+
+
+        /*  // check if the user is the one who sends friend's request
         if ($this->getUser()->getId() !== $user->getId()) {
             return $this->respondUnauthorized("t'as rien à faire là dude !");
-        }
+        } */
+
+
         $friendship = $this->getDoctrine()->getRepository(UserFriends::class)->getFriendship($user, $idFriend);
         //check if the relation does not exist yet 
         if ($friendship !== null) {
@@ -79,10 +87,13 @@ class UserController extends ApiController
      */
     public function friendResponse(User $user, $idFriend, $bool)
     {
-        // check if the user is the one who requests friend's request
+        /* // check if the user is the one who requests friend's request
         if ($this->getUser()->getId() !== $user->getId()) {
             return $this->respondUnauthorized("t'as rien à faire là dude !");
-        }
+        } */
+
+        $this->denyAccessUnlessGranted('onlyuser', $user);
+
 
         $friend = $this->getDoctrine()->getRepository(User::class)->find($idFriend);
         $friendship = $this->getDoctrine()->getRepository(UserFriends::class)->getFriendship($idFriend, $user);
@@ -112,6 +123,16 @@ class UserController extends ApiController
             $friendship->setIsAccepted(false);
             $addNewRelation->setIsAccepted(false);
         }
+        /*
+            $iSuccess = true;
+            if($bool != 1){
+                $iSuccess = false;
+            } 
+            $friendship->setIsAccepted($iSuccess);
+            $addNewRelation->setIsAccepted($iSuccess)
+        
+        
+        */
         //Get Manager
         $manager = $this->getDoctrine()->getManager();
         $manager->persist($addNewRelation, $friendship);
@@ -127,8 +148,6 @@ class UserController extends ApiController
             ], 201);
         }
     }
-
-
     /**
      *
      * 
@@ -138,11 +157,12 @@ class UserController extends ApiController
     public function unfriend(User $user, $idFriend)
     {
 
+        $this->denyAccessUnlessGranted('onlyuser', $user);
         // check if the user is the one who sends the unfriend  
-        if ($this->getUser()->getId() !== $user->getId()) {
+        /*  if ($this->getUser()->getId() !== $user->getId()) {
             return $this->respondUnauthorized("t'as rien à faire là dude !");
-        }
-
+        } */
+        $userFrienRepository =  $this->getDoctrine()->getRepository(UserFriends::class);
         $friendship = $this->getDoctrine()->getRepository(UserFriends::class)->getFriendship($user, $idFriend);
         $friendshipReverse = $this->getDoctrine()->getRepository(UserFriends::class)->getFriendship($idFriend, $user);
 
@@ -182,9 +202,8 @@ class UserController extends ApiController
      */
     public function read(int $id, Request $request, UserRepository $userRepository)
     {
-
-
         $user = $userRepository->getFullUser($id);
+
         return $this->respondWithSuccess(
             $this->serializer->normalize($user, 'null', ['groups' => ['api_v1_users', 'api_v1_users_read']])
         );
@@ -228,7 +247,6 @@ class UserController extends ApiController
 
         if ($form->isValid()) {
 
-            dd($user);
             $user->setPassword($this->encoder->encodePassword($user, $user->getPassword()));
             $em = $this->getDoctrine()->getManager();
             $em->persist($user);
@@ -247,42 +265,98 @@ class UserController extends ApiController
      * @Route("/{id}/update", name="update",  methods={"GET","POST"})
      * 
      */
-    public function update(ImageUploader $imageUploader,Request $request, User $user, ObjectNormalizer $objetNormalizer)
+    public function update(ImageUploader $imageUploader, Request $request, User $user, ObjectNormalizer $objetNormalizer)
     {
 
-        if ($this->getUser()->getId() !== $user->getId()) {
+
+
+        $this->denyAccessUnlessGranted('edit', $user);
+
+        /*   if ($this->getUser()->getId() !== $user->getId()) {
             return $this->respondUnauthorized("t'as rien à faire là dude !");
         } 
-
+ */
         $form = $this->createForm(UserType::class, $user, ['csrf_protection' => false]);
 
-      
-
         // L'option true (deuxième argument de json_decode(), permet de spécifier qu'on veut un arra yet pas un objet)
-        //$json = json_decode($request->getContent(), true);
-        $json = json_decode($request->get('json'), true);
+        $json = json_decode($request->getContent(), true);
+        //$json = json_decode($request->get('json'), true);
         $imageFile = $request->files->get('image');
-      
+
         // On simule l'envoi du formulaire
         $form->submit($json);
+        //dd($form->submit($json));
         if ($form->isValid()) {
 
             $user->setPassword($this->encoder->encodePassword($user, $user->getPassword()));
             $manager = $this->getDoctrine()->getManager();
-            if ($imageFile) {
-               $fileName = $imageUploader->avatarFile($imageFile, 'images');
-               $user->setAvatar($fileName);
-            }
-           
             $manager->flush();
-
+            //return $this->respondWithSuccess("cpicoi");
             $userJson = $this->serializer->normalize($user, null, ['groups' => 'api_v1_users']);
 
             return $this->respondWithSuccess($userJson);
         } else {
+            dd($form->getErrors());
             return $this->json((string) $form->getErrors(true), 400);
         }
     }
+
+
+    /**
+     * @Route("/{id}/updateAvatar", name="updateAvatar",  methods={"GET","POST"})
+     * 
+     * 
+     */
+    public function updateAvatar(ImageUploader $imageUploader, Request $request, User $user, ObjectNormalizer $objetNormalizer, ValidatorInterface $validator)
+    {
+
+        /*  // dump($uploadedFile->gettype());
+        $form = $this->createForm(UpdateAvatar::class, $user, ['csrf_protection' => false]);
+        dump($form);
+        $form->handleRequest($request);
+        dd($form);
+
+        //dump($request);
+        //dump($uploadedFile);
+       
+        
+        $form->submit($uploadedFile);
+        dd($form['avatar']->getData());
+        dd($form);
+        dd($form->isValid()); 
+        */
+
+        // Validator for the uploaded file
+        $uploadedFile = $request->files->get('avatar');
+        $violations = $validator->validate(
+            $uploadedFile,
+            [
+                new NotBlank([
+                    'message' => 'Please select a file to upload'
+                ]),
+                new File([
+                    'maxSize' => '5M',
+                    'mimeTypes' => [
+                        'image/*',
+                    ]
+                ])
+            ]
+        );
+
+        if ($violations->count() > 0) {
+            return $this->json($violations, 400);
+        }
+        
+        if ($uploadedFile) {
+            $fileName = $imageUploader->avatarFile($uploadedFile, 'images');
+            $user->setAvatar($fileName);
+        }
+        $manager = $this->getDoctrine()->getManager();
+        $manager->flush();
+        return $this->respondWithSuccess("c'est bon");
+    }
+
+
 
     /**
      * @Route("/{id}/stats", name="stats", methods={"GET"})
@@ -300,10 +374,12 @@ class UserController extends ApiController
      */
     public function delete(User $user)
     {
+
+        $this->denyAccessUnlessGranted('edit', $user);
         // check if the user is the one who requests friend's request
-        if ($this->getUser()->getId() !== $user->getId()) {
+        /*    if ($this->getUser()->getId() !== $user->getId()) {
             return $this->respondUnauthorized("t'as rien à faire là dude !");
-        }
+        } */
         $manager = $this->getDoctrine()->getManager();
         $manager->remove($user);
         $manager->flush();
@@ -312,19 +388,11 @@ class UserController extends ApiController
         ]);
     }
 
-    /*   {
-    "username": "jerrrrrerrreerreeeodme",
-    "email":"jeeeerorrrrrmerre@gddmailrr.com",
-    "password":"boeeeerrebkor3!",
-    "roles": ["ROLE_ADMIN"],
-    "avatar": "123.jpg"
-} */
-
     /*
      * @Route("/{id}/banned", name="banned",methods={"GET","POST"})
      * @IsGranted("ROLE_ADMIN")
      */
-    
+
     // For V2 
     public function banned($id)
     {

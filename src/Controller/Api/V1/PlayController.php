@@ -29,7 +29,6 @@ class PlayController extends ApiController
         $this->serializer = new Serializer([$objetNormalizer]);
     }
 
-
     /**
      * 
      * 
@@ -56,8 +55,7 @@ class PlayController extends ApiController
       return $this->respondCreated();
     
     }
-
-
+    
     /**
      * @Route("/", name="list")
      */

@@ -22,11 +22,11 @@ class UserFriendsRepository extends ServiceEntityRepository
 
 
 
+   
+    // Know if a relationship exists
     public function getFriendship($user, $friend)
     {
-
-      //  dd($user, $friend);
-
+        
         // je crée un querybuilder sur l'objet User avec l'alias 'user'
         $builder = $this->createQueryBuilder('Friendship');
      
@@ -40,12 +40,10 @@ class UserFriendsRepository extends ServiceEntityRepository
         return $result;
     }
 
-
+    //Get Friendship (avoid circular reference)
     public function getFriend(User $user)
     {
-
         $em = $this->getEntityManager();
-
         $query =  $em->createQuery('
         SELECT f, u, us
         FROM App\Entity\UserFriends as  f
@@ -54,8 +52,6 @@ class UserFriendsRepository extends ServiceEntityRepository
         WHERE u.id = :user
         ')
             ->setParameter('user', $user->getId());
-
-
 
         return $result = $query->getResult();
     }

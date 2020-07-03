@@ -15,29 +15,6 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
 {
-    /**
-     * @Route("/login", name="app_login")
-     * @param AuthenticationUtils $authenticationUtils
-     * @return Response
-     */
-    /* public function login(AuthenticationUtils $authenticationUtils): ?Response
-    {
-    
-
-        if ( $this->getUser() ==="ROLE_ADMIN" && "ROLE_SUPER_ADMIN") {
-            dd("coicoi");
-            $error = $authenticationUtils->getLastAuthenticationError();
-            // last username entered by the user
-            $lastUsername = $authenticationUtils->getLastUsername();
-
-            return $this->render('security/login.html.twig', ['last_username' => $lastUsername, 'error' => $error]);
-        } elseif ($this->getUser()==="ROLE_USER"){
-            dd("pas coucou");
-           
-        }
-        return $this->redirect("www.pornhub.com");
-    } */
-
 
     /**
      * @Route("/login", name="app_login")
@@ -52,13 +29,10 @@ class SecurityController extends AbstractController
         $error = $authenticationUtils->getLastAuthenticationError();
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
-       // dd($lastUsername);
-       
+    
+    
         return $this->render('security/login.html.twig', ['last_username' => $lastUsername, 'error' => $error]);
     }
-
-
-
 
     /**
      * @Route("/logout", name="app_logout")
@@ -67,8 +41,7 @@ class SecurityController extends AbstractController
     {
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
-
-
+    
     /**
      * @Route("/{id}/update", name="security_update", requirements={"id" = "\d+"}, methods={"GET", "POST"})
      */

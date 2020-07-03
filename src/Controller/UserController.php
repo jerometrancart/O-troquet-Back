@@ -87,10 +87,7 @@ class UserController extends AbstractController
 
         
         $mailerService->sendToken($token = [], $to, $user,$tokenLifeTime = [],'Compte banni','user/banned.html.twig');
-
-
-
-
+        
         return $this->render('user/index.html.twig', [
             'users' => $userRepository->findAll(),
         ]);

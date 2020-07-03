@@ -1,29 +1,6 @@
-# nelmio_cors:
-#     defaults:
-#         origin_regex: true
-#         allow_credentials: true
-#         allow_origin: ['%env(CORS_ALLOW_ORIGIN)%']
-#         allow_methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE']
-#         allow_headers: ['Content-Type', 'Authorization']
-#         expose_headers: ['Link']
-#         max_age: 3600
-#     paths:
-#         '^/': null
-
-# # /* // Add headers for CORS
-# # header('Access-Control-Allow-Origin: http://localhost:8080');
-# # header('Access-Control-Allow-Credentials: true ');
-# # header("Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method");
-# # header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
-# # header("Allow: GET, POST, OPTIONS, PUT, DELETE");
-# # $method = $_SERVER['REQUEST_METHOD'];
-# # if ($method == "OPTIONS") {
-# #     die();
-
 
 nelmio_cors:
-    defaults:
-        #allow_credentials: true
+    defaults:        
         origin_regex: true
         allow_credentials: true
         allow_origin: ['*']
@@ -33,7 +10,6 @@ nelmio_cors:
         max_age: 3600
     paths:
         '^/login':
-            #allow_credentials: true
             origin_regex: true
             allow_credentials: true
             allow_origin: ['*']
@@ -46,3 +22,13 @@ nelmio_cors:
             allow_headers: ['*']
             allow_methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE']
             max_age: 3600
+# /* // Add headers for CORS
+# header('Access-Control-Allow-Origin: http://localhost:8080');
+# header('Access-Control-Allow-Credentials: true ');
+# header("Access-Control-Allow-Headers: X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Request-Method");
+# header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
+# header("Allow: GET, POST, OPTIONS, PUT, DELETE");
+# $method = $_SERVER['REQUEST_METHOD'];
+# if ($method == "OPTIONS") {
+#     die();
+
